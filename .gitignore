@@ -1,5 +1,6 @@
 venv
 local
 __pycache__
-*/*
-!*/**/*.g4
+Scriptorium
+!Scriptorium/Scriptorium.g4
+**/*.st
