@@ -4,27 +4,37 @@ from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
 
 class Visitor(ScriptoriumVisitor):
 
+    def visitStringExpr(self, ctx:ScriptoriumParser.StringExprContext):
+        secondary = ctx.STRING().getText()[1:-1]
+        primary = None
+        if ctx.stringExpr() is None:
+            return secondary
+        else:
+            primary = self.visit(ctx.stringExpr())
+        return primary+secondary
+
     def visitIntExpr(self, ctx:ScriptoriumParser.IntExprContext):
-        ints = [int(num.getText()) for num in list(ctx.INT())]
-        if ctx.intExpr() is None and len(ints) == 1:
-            return ints[0]
-        if ctx.intExpr() is not None:
-            ints.insert(0, self.visit(ctx.intExpr()))
+        secondary = int(ctx.INT().getText())
+        primary = None
+        if ctx.intExpr() is None:
+            return secondary
+        else:
+            primary = self.visit(ctx.intExpr())
         match ctx.getChild(1).getChild(0).getSymbol().type:
             case ScriptoriumParser.ADD:
-                return ints[0]+ints[1]
+                return primary+secondary
             case ScriptoriumParser.SUB:
-                return ints[0]-ints[1]
+                return primary-secondary
             case ScriptoriumParser.MUL:
-                return ints[0]*ints[1]
+                return primary*secondary
             case ScriptoriumParser.DIV:
-                return ints[0]/ints[1]
+                return primary/secondary
             case ScriptoriumParser.POW:
-                return int(math.pow(ints[0], ints[1]))
+                return int(math.pow(primary, secondary))
             case ScriptoriumParser.MOD:
-                return ints[0] % ints[1]
+                return primary % secondary
             case ScriptoriumParser.FDIV:
-                return ints[0] // ints[1]
+                return primary // secondary
     
     def visitPrint(self, ctx:ScriptoriumParser.PrintContext):
         print(self.visit(ctx.printExpr()))

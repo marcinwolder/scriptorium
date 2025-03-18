@@ -8,11 +8,18 @@ printExpr: expr
          | printExpr 'et' expr
          ;
 
-expr: intExpr ;
+expr: intExpr 
+    | stringExpr
+    ;
 
-intExpr: INT intOpp INT
+stringExpr: STRING
+          | stringExpr ADD STRING
+          ;
+
+STRING: '"'.*?'"' ;
+
+intExpr: INT
        | intExpr intOpp INT
-       | INT
        ;
 
 intOpp: ADD
