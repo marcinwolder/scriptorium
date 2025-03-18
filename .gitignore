@@ -4,3 +4,4 @@ __pycache__
 Scriptorium
 !Scriptorium/Scriptorium.g4
 **/*.st
+**/*_old*

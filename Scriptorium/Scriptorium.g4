@@ -1,21 +1,37 @@
 grammar Scriptorium;
 
-start: (variable|print)* EOF;
+start: print* EOF ;
 
-print: 'scribere' (NAME) '.' ;
-variable: (NUMERUS|FRACTIO|VERITAS|SENTENTIA) NAME 'esto' (INTVALUE|FLOATVALUE|BOOLVALUE|STRINGVALUE|NULLVALUE) '.';
+print: 'scribere' printExpr '.' ;
 
-NUMERUS: 'numerus' ;
-FRACTIO: 'fractio' ;
-VERITAS: 'veritas' ;
-SENTENTIA: 'sententia' ;
+printExpr: expr
+         | printExpr 'et' expr
+         ;
 
-NAME: [A-Za-z_]+ ;
+expr: intExpr ;
 
-INTVALUE: [0-9]+ ;
-FLOATVALUE: [0-9]+'.'[0-9]+ ;
-BOOLVALUE: ('verum'|'falsum') ;
-STRINGVALUE: '"'.*?'"' ;
-NULLVALUE: 'nihil' ;
+intExpr: INT intOpp INT
+       | intExpr intOpp INT
+       | INT
+       ;
 
-WS: [ \t\n\r]+ -> skip ;
+intOpp: ADD
+      | SUB
+      | MUL 
+      | DIV
+      | POW
+      | MOD
+      | FDIV
+      ;
+
+ADD: 'adde';
+SUB: 'minue';
+MUL: 'multiplica';
+DIV: 'divide';
+POW: 'potentia';
+MOD: 'residuum';
+FDIV: 'totum';
+
+INT: [0-9]+ ;
+
+WS: [ \n\t\r] -> skip ;
