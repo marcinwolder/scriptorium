@@ -1,9 +1,10 @@
 import math
+
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
+from antlr4.tree.Tree import TerminalNodeImpl
 
 class Visitor(ScriptoriumVisitor):
-
     def visitStringExpr(self, ctx:ScriptoriumParser.StringExprContext):
         secondary = ctx.STRING().getText()[1:-1]
         primary = None

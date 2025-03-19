@@ -16,7 +16,9 @@ stringExpr: STRING
           | stringExpr ADD STRING
           ;
 
-STRING: '"'.*?'"' ;
+STRING: '"' (ESC | ~["\\])* '"' ;
+ESC: '\\' ['"\\bfnrt] ;
+
 
 intExpr: INT
        | intExpr intOpp INT
@@ -31,6 +33,8 @@ intOpp: ADD
       | FDIV
       ;
 
+INT: [0-9]+ ;
+
 ADD: 'adde';
 SUB: 'minue';
 MUL: 'multiplica';
@@ -38,7 +42,5 @@ DIV: 'divide';
 POW: 'potentia';
 MOD: 'residuum';
 FDIV: 'totum';
-
-INT: [0-9]+ ;
 
 WS: [ \n\t\r] -> skip ;
