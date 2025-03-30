@@ -4,6 +4,12 @@ from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
 
 class Visitor(ScriptoriumVisitor):
+    var_map = dict()
+    listener = None
+    def __init__(self, listener):
+        self.listener = listener
+        super().__init__()
+
     def visitPrint(self, ctx):
         print(self.visit(ctx.printExpr()))
 
@@ -98,6 +104,9 @@ class Visitor(ScriptoriumVisitor):
             case 'falsum':
                 return False
             
+    def visitNull(self, ctx):
+        return None
+            
     def visitStringLogic(self, ctx):
         primary:str = self.visit(ctx.stringExpr(0))
         secondary:str = self.visit(ctx.stringExpr(1))
@@ -165,3 +174,43 @@ class Visitor(ScriptoriumVisitor):
     def visitBoolNot(self, ctx):
         primary:bool = self.visit(ctx.boolExpr())
         return not primary
+
+    def visitVarExpr(self, ctx):
+        var = None;
+        try:
+            var = self.var_map[ctx.NAME().getText()]
+        except:
+            error_msg = f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{ctx.NAME().getText()}\""
+            raise Exception(error_msg)
+        return var
+    
+    def visitInputExpr(self, ctx):
+        return input(self.visit(ctx.printExpr()))
+
+    def visitVariable(self, ctx):
+        value = None
+        if ctx.NAME().getText() in self.var_map:
+            error_msg = f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable cannot be declared multiple times"
+            raise Exception(error_msg)
+        if ctx.nullExpr() is not None:
+            self.var_map[ctx.NAME().getText()] = None
+            return
+        if ctx.inputExpr() is not None:
+            value = self.visit(ctx.inputExpr())
+        try:
+            match ctx.type_.type:
+                case ScriptoriumParser.INT_TYPE:
+                    value = value or self.visit(ctx.intExpr())
+                    self.var_map[ctx.NAME().getText()] = int(value)
+                case ScriptoriumParser.FLOAT_TYPE:
+                    value = value or self.visit(ctx.floatExpr())
+                    self.var_map[ctx.NAME().getText()] = float(value)
+                case ScriptoriumParser.STRING_TYPE:
+                    value = value or self.visit(ctx.stringExpr())
+                    self.var_map[ctx.NAME().getText()] = str(value)
+                case ScriptoriumParser.BOOL_TYPE:
+                    value = value or self.visit(ctx.boolExpr())
+                    self.var_map[ctx.NAME().getText()] = bool(value)
+        except:
+            error_msg = f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error"
+            raise Exception(error_msg)

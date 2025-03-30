@@ -1,0 +1,11 @@
+fractio var esto 4,0.
+sententia var2 esto nihil.
+
+scribere var adde 1.
+scribere var2.
+
+sententia text esto rogare "Wpisz imię: ".
+scribere "Hi " adde text adde "!".
+
+veritas x esto var2.
+scribere x.

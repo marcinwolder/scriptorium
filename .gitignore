@@ -4,4 +4,4 @@ __pycache__
 Scriptorium
 !Scriptorium/Scriptorium.g4
 **/*.cr7
-**/*_old*
+!*-2025/*.cr7
