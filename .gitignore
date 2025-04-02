@@ -3,4 +3,5 @@ local
 __pycache__
 Scriptorium
 !Scriptorium/Scriptorium.g4
-**/*.st
+**/*.cr7
+!*-2025/*.cr7
