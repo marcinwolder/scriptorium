@@ -1,5 +1,10 @@
 # 29-04-2025
 
+### Naprawiono błędy:
+
+* Przypisywanie zmiennych różnych typów
+* Ujednolicono działania matematyczne na typach `int` i `float`
+
 ### Należy rozszerzyć implementację swojego języka o następujące elementy:
 
 #### Typ numeryczny i co najmniej podstawowe operacje arytmetyczne (dodawanie, odejmowanie, mnożenie, dzielenie, nawiasowanie) na stałych typu numerycznego.
