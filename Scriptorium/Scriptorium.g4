@@ -15,10 +15,11 @@ action: variableDeclaration
 
 expr: varExpr  
     | boolExpr
-    | intExpr       
     | floatExpr     
+    | intExpr       
     | stringExpr       
-    | nullExpr          
+    | nullExpr      
+    | inputExpr    
     ;
 
 varExpr: NAME ;
@@ -29,22 +30,19 @@ stringExpr
     | varExpr                     #StringVar
     ;
 
-intExpr: INT                                    #Int
-       | intExpr POW intExpr                    #IntPow
-       | intExpr op=(MUL | DIV) intExpr         #IntMulDiv
-       | intExpr op=(ADD | SUB) intExpr         #IntAddSub
-       | intExpr MOD intExpr                    #IntMod
-       | varExpr                                #IntVar
-       ;
+numericExpr: INT                                        #NumericInt
+           | FLOAT                                      #NumericFloat
+           | LP numericExpr RP                          #NumericBrackets
+           | numericExpr POW numericExpr                #NumericPow
+           | numericExpr op=(MUL|DIV|FDIV) numericExpr  #NumericMulDiv
+           | numericExpr op=(ADD|SUB) numericExpr       #NumericAddSub
+           | numericExpr MOD numericExpr                #NumericMod
+           | varExpr                                    #NumericVar
+           ;
+intExpr: numericExpr #Int ;
+floatExpr: numericExpr #Float ;
 
-floatExpr: FLOAT                                      #Float
-         | floatExpr POW floatExpr                    #FloatPow
-         | floatExpr op=(MUL | DIV | FDIV) floatExpr  #FloatMulDiv
-         | floatExpr op=(ADD | SUB) floatExpr         #FloatAddSub
-         | floatExpr MOD floatExpr                    #FloatMod
-         | varExpr                                    #FloatVar
-         ;
-
+// FIXME: Zastąpić intExpr i floatExpr numericExpr
 boolExpr: BOOL                                              #Bool
         | NOT boolExpr                                      #BoolNot
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
@@ -70,11 +68,7 @@ forLoop: FOR NAME FROM from=INT TO to=INT COLON (action|continueStatement|breakS
 breakStatement: BREAK DOT;
 continueStatement: CONTINUE DOT;
 
-variableDeclaration: type=INT_TYPE NAME IS (intExpr|nullExpr|inputExpr) DOT
-                   | type=FLOAT_TYPE NAME IS (floatExpr|nullExpr|inputExpr) DOT
-                   | type=STRING_TYPE NAME IS (stringExpr|nullExpr|inputExpr) DOT
-                   | type=BOOL_TYPE NAME IS (boolExpr|nullExpr|inputExpr) DOT
-                   ;
+variableDeclaration: type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME IS expr DOT ;
 
 if: ifBlock ifElseBlock* elseBlock?;
 

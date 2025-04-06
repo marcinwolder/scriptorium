@@ -1,14 +1,16 @@
 # 29-04-2025
 
-### Naprawiono błędy:
-
-* Przypisywanie zmiennych różnych typów
-* Ujednolicono działania matematyczne na typach `int` i `float`
-
 ### Należy rozszerzyć implementację swojego języka o następujące elementy:
 
-#### Typ numeryczny i co najmniej podstawowe operacje arytmetyczne (dodawanie, odejmowanie, mnożenie, dzielenie, nawiasowanie) na stałych typu numerycznego.
+#### 1. Typ numeryczny i co najmniej podstawowe operacje arytmetyczne (dodawanie, odejmowanie, mnożenie, dzielenie, nawiasowanie) na stałych typu numerycznego.
 
-#### Typ logiczny (`true`/`false`) i co najmniej podstawowe operacje logiczne (`and`, `or`, `not`, nawiasowanie) na  stałych oraz porównywanie stałych typu numerycznego (`<`, `>` , `==`, `!=`) co w wyniku powinno dawać typ logiczny
+Działający typ numeryczny z podanymi wymaganiami został przygotowany na poprzedni etap.
 
-#### Obsługa globalnej przestrzeni nazw dla zmiennych (zgodnie z tym, o czym mówiłem na ostatnich ćwiczeniach). Należy zaimplementować 2-przebiegowy proces użycia zmiennych. W pierwszym przebiegu rejestrujemy (np. w mapie/słowniku) deklaracje wszystkich zmiennych wraz z ich typami (w tym przebiegu należy zgłosić błąd jeśli nastąpiła redeklaracja zmiennej). W tym przebiegu wygodnie jest użyć listenera. W drugim przebiegu wykonujemy (podstawowe)  operacje na zmiennych (opisane powyżej w zadaniu - dodawanie, odejmowanie, itd.). W tym przebiegu należy zgłosić błąd jeśli użyta zmienna nie została zarejestrowana (w globalnej przestrzeni zmiennych).
+**Naprawiono błędy**:
+
+* **Przypisywanie zmiennych różnych typów** - teraz można do zmiennych przypisywać różne typy, które są castowane na typ docelowy lub wyrzucają wyjątek
+* **Ujednolicono działania matematyczne** na typach `int` i `float` - np. 2 + 2,5
+
+#### 2. Typ logiczny (`true`/`false`) i co najmniej podstawowe operacje logiczne (`and`, `or`, `not`, nawiasowanie) na  stałych oraz porównywanie stałych typu numerycznego (`<`, `>` , `==`, `!=`) co w wyniku powinno dawać typ logiczny
+
+#### 3. Obsługa globalnej przestrzeni nazw dla zmiennych (zgodnie z tym, o czym mówiłem na ostatnich ćwiczeniach). Należy zaimplementować 2-przebiegowy proces użycia zmiennych. W pierwszym przebiegu rejestrujemy (np. w mapie/słowniku) deklaracje wszystkich zmiennych wraz z ich typami (w tym przebiegu należy zgłosić błąd jeśli nastąpiła redeklaracja zmiennej). W tym przebiegu wygodnie jest użyć listenera. W drugim przebiegu wykonujemy (podstawowe)  operacje na zmiennych (opisane powyżej w zadaniu - dodawanie, odejmowanie, itd.). W tym przebiegu należy zgłosić błąd jeśli użyta zmienna nie została zarejestrowana (w globalnej przestrzeni zmiennych).

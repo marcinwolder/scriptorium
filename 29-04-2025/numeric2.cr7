@@ -1,0 +1,8 @@
+fractio x esto "2,5".
+scribere x.
+
+veritas z esto "Hello".
+scribere z.
+
+fractio y esto "Hello".
+scribere y.
