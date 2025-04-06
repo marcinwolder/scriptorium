@@ -33,6 +33,7 @@ stringExpr
 numericExpr: INT                                        #NumericInt
            | FLOAT                                      #NumericFloat
            | LP numericExpr RP                          #NumericBrackets
+           | op=(PLUS|MINUS) numericExpr                #NumericPlusMinus
            | numericExpr POW numericExpr                #NumericPow
            | numericExpr op=(MUL|DIV|FDIV) numericExpr  #NumericMulDiv
            | numericExpr op=(ADD|SUB) numericExpr       #NumericAddSub
@@ -42,12 +43,11 @@ numericExpr: INT                                        #NumericInt
 intExpr: numericExpr #Int ;
 floatExpr: numericExpr #Float ;
 
-// FIXME: Zastąpić intExpr i floatExpr numericExpr
 boolExpr: BOOL                                              #Bool
+        | LP boolExpr RP                                    #BoolBrackets
         | NOT boolExpr                                      #BoolNot
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
-        | intExpr op=(LT|LE|GT|GE|EQ|NEQ) intExpr           #IntLogic
-        | floatExpr op=(LT|LE|GT|GE|EQ|NEQ) floatExpr       #FloatLogic
+        | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
         | boolExpr op=(AND|OR|EQ|NEQ) boolExpr              #BoolLogic
         | varExpr                                           #BoolVar
         ;
@@ -101,8 +101,11 @@ ELSE: 'aliter' ;
 INPUT: 'rogare' ;
 PRINT: 'scribere' ;
 
-INT: '-'? [0-9]+ ;
-FLOAT: '-'? [0-9]+ ',' [0-9]+ ;
+PLUS: 'positivum' ;
+MINUS: 'negans' ;
+
+INT: (PLUS|MINUS)? [0-9]+ ;
+FLOAT: (PLUS|MINUS)? [0-9]+ ',' [0-9]+ ;
 fragment ESC: '\\' ["\\] ;
 STRING: '"' (ESC | ~["\\\n])* '"' ;
 BOOL: ('verum'|'falsum') ;

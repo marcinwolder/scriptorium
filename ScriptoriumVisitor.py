@@ -39,6 +39,13 @@ class Visitor(ScriptoriumVisitor):
     def visitNumericFloat(self, ctx):
         return float(ctx.FLOAT().getText().replace(",", "."))
 
+    def visitNumericPlusMinus(self, ctx):
+        match ctx.op.type:
+            case ScriptoriumParser.PLUS:
+                return self.visit(ctx.numericExpr())
+            case ScriptoriumParser.MINUS:
+                return -self.visit(ctx.numericExpr())
+
     def visitNumericBrackets(self, ctx):
         return self.visit(ctx.numericExpr())
 
@@ -72,9 +79,6 @@ class Visitor(ScriptoriumVisitor):
         secondary = self.visit(ctx.numericExpr(1))
         return primary % secondary
     
-    def visitNumericVar(self, ctx):
-        return 
-
     # INT
 
     def visitInt(self, ctx):
@@ -99,6 +103,9 @@ class Visitor(ScriptoriumVisitor):
             case 'falsum':
                 return False
             
+    def visitBoolBrackets(self, ctx):
+        return self.visit(ctx.boolExpr())
+
     def visitStringLogic(self, ctx):
         primary:str = self.visit(ctx.stringExpr(0))
         secondary:str = self.visit(ctx.stringExpr(1))
@@ -115,27 +122,10 @@ class Visitor(ScriptoriumVisitor):
                 return primary <= secondary
             case ScriptoriumParser.GE:
                 return primary >= secondary
-            
-    def visitIntLogic(self, ctx):
-        primary:int = self.visit(ctx.intExpr(0))
-        secondary:int = self.visit(ctx.intExpr(1))
-        match ctx.op.type:
-            case ScriptoriumParser.EQ:
-                return primary == secondary
-            case ScriptoriumParser.NEQ:
-                return primary != secondary
-            case ScriptoriumParser.LT:
-                return primary < secondary
-            case ScriptoriumParser.GT:
-                return primary > secondary
-            case ScriptoriumParser.LE:
-                return primary <= secondary
-            case ScriptoriumParser.GE:
-                return primary >= secondary
 
-    def visitFloatLogic(self, ctx):
-        primary:float = self.visit(ctx.floatExpr(0))
-        secondary:float = self.visit(ctx.floatExpr(1))
+    def visitNumericLogic(self, ctx):
+        primary:float = self.visit(ctx.numericExpr(0))
+        secondary:float = self.visit(ctx.numericExpr(1))
         match ctx.op.type:
             case ScriptoriumParser.EQ:
                 return primary == secondary
