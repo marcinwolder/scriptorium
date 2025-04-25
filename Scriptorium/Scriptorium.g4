@@ -1,25 +1,56 @@
 grammar Scriptorium;
 
+tokens { INDENT, DEDENT }
+
+@lexer::header{
+from antlr_denter.DenterHelper import DenterHelper
+from Scriptorium.ScriptoriumParser import ScriptoriumParser
+}
+@lexer::members {
+class ScriptoriumDenter(DenterHelper):
+    def __init__(self, lexer, nl_token, indent_token, dedent_token, ignore_eof):
+        super().__init__(nl_token, indent_token, dedent_token, ignore_eof)
+        self.lexer: ScriptoriumLexer = lexer
+
+    def pull_token(self):
+        buf = super(ScriptoriumLexer, self.lexer).nextToken()
+        # print(buf)
+        return buf
+
+denter = None
+
+def nextToken(self):
+    if not self.denter:
+        self.denter = self.ScriptoriumDenter(self, self.NL, ScriptoriumParser.INDENT, ScriptoriumParser.DEDENT, False)
+    buf = self.denter.next_token()
+    # print(buf)
+    return buf
+
+}
+
+
 // PARSER
 
-start: (action|NL)* EOF;
+start: action* EOF;
 
 action: variableDeclaration
+      | variableDefinition
       | if
       | forLoop
       | whileLoop
       | function
       | print
       | errorStatement
+      | COMMENT
       ;
 
-expr: varExpr  
-    | boolExpr
+expr: boolExpr
     | floatExpr     
     | intExpr       
     | stringExpr       
     | nullExpr      
-    | inputExpr    
+    | inputExpr
+    | varExpr    
     ;
 
 varExpr: NAME ;
@@ -54,31 +85,35 @@ boolExpr: BOOL                                              #Bool
 
 nullExpr: NULL #Null ;
 
-errorStatement: ERROR printExpr DOT ;
+errorStatement: ERROR printExpr DOT NL;
 
-funcParam: type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
-function: type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON (action|returnStatement)+ NL;
+funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
+function: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON funcBlock ;
+funcBlock: INDENT (action|returnStatement)+ DEDENT ;
 
-returnStatement: RETURN expr DOT;
+returnStatement: RETURN expr DOT NL;
 
-whileLoop: WHILE boolExpr COLON (action|continueStatement|breakStatement)+ NL ;
+whileLoop: WHILE boolExpr COLON loopBlock ;
+forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;
+loopBlock: INDENT (action|continueStatement|breakStatement)+ DEDENT ;
 
-forLoop: FOR NAME FROM from=INT TO to=INT COLON (action|continueStatement|breakStatement)+ NL ;
+breakStatement: BREAK DOT NL;
+continueStatement: CONTINUE DOT NL;
 
-breakStatement: BREAK DOT;
-continueStatement: CONTINUE DOT;
-
-variableDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME IS expr DOT ;
+variableDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) variableDefinition
+                   | varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME DOT NL;
+variableDefinition: NAME IS expr DOT NL;
 
 if: ifBlock ifElseBlock* elseBlock?;
 
-ifBlock: IF boolExpr COLON (action)+ NL ;
-ifElseBlock: ELSE IF boolExpr COLON (action)+ NL ;
-elseBlock: ELSE COLON (action)+ NL ;
+ifBlock: IF boolExpr COLON actionBlock ;
+ifElseBlock: ELSE IF boolExpr COLON actionBlock ;
+elseBlock: ELSE COLON actionBlock ;
+actionBlock: INDENT action+ DEDENT ;
 
 inputExpr: INPUT printExpr ;
 
-print: PRINT printExpr DOT ;
+print: PRINT printExpr DOT NL;
 
 printExpr: expr                                 #ExprInPrint
          | printExpr PRINT_SEPARATOR printExpr  #PrintAdd
@@ -101,8 +136,10 @@ ELSE: 'aliter' ;
 INPUT: 'rogare' ;
 PRINT: 'scribere' ;
 
-PLUS: 'positivum' ;
-MINUS: 'negans' ;
+PLUS: 'positivum' 
+    | '+' ;
+MINUS: 'negans' 
+     | '-' ;
 
 INT: (PLUS|MINUS)? [0-9]+ ;
 FLOAT: (PLUS|MINUS)? [0-9]+ ',' [0-9]+ ;
@@ -147,5 +184,9 @@ RP: ')' ;
 
 NAME: [a-z_]+[a-zA-Z0-9_]* ;
 
-WS: [ \t]+ -> channel(HIDDEN) ;
-NL: '\r'? '\n';
+COMMENT: '//' .*? NL -> channel(HIDDEN);
+
+NL: ('\r'? '\n' '\t'*);
+WS: [ ]+ -> skip;
+// WS: [ ]+ -> channel(HIDDEN) ;
+// NL: ('\r'? '\n');
