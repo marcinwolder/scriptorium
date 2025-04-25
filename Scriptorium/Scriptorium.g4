@@ -44,8 +44,8 @@ intExpr: numericExpr #Int ;
 floatExpr: numericExpr #Float ;
 
 boolExpr: BOOL                                              #Bool
-        | LP boolExpr RP                                    #BoolBrackets
         | NOT boolExpr                                      #BoolNot
+        | LP boolExpr RP                                    #BoolBrackets
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
         | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
         | boolExpr op=(AND|OR|EQ|NEQ) boolExpr              #BoolLogic
@@ -68,7 +68,7 @@ forLoop: FOR NAME FROM from=INT TO to=INT COLON (action|continueStatement|breakS
 breakStatement: BREAK DOT;
 continueStatement: CONTINUE DOT;
 
-variableDeclaration: type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME IS expr DOT ;
+variableDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME IS expr DOT ;
 
 if: ifBlock ifElseBlock* elseBlock?;
 

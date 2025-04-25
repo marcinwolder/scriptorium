@@ -169,18 +169,18 @@ class Visitor(ScriptoriumVisitor):
             self.var_map[ctx.NAME().getText()] = None
             return
         try:
-            match ctx.type_.type:
+            match ctx.varType.type:
                 case ScriptoriumParser.INT_TYPE:
-                    value = value or self.visit(ctx.intExpr())
+                    value = value or self.visit(ctx.expr())
                     self.var_map[ctx.NAME().getText()] = int(value)
                 case ScriptoriumParser.FLOAT_TYPE:
-                    value = value or self.visit(ctx.floatExpr())
+                    value = value or self.visit(ctx.expr())
                     self.var_map[ctx.NAME().getText()] = float(trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value)
                 case ScriptoriumParser.STRING_TYPE:
-                    value = value or self.visit(ctx.stringExpr())
+                    value = value or self.visit(ctx.expr())
                     self.var_map[ctx.NAME().getText()] = str(value)
                 case ScriptoriumParser.BOOL_TYPE:
-                    value = value or self.visit(ctx.boolExpr())
+                    value = value or self.visit(ctx.expr())
                     self.var_map[ctx.NAME().getText()] = bool(value)
         except:
             error_msg = f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error"

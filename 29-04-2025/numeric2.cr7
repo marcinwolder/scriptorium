@@ -1,8 +1,11 @@
 fractio x esto "2,5".
 scribere x.
 
-veritas z esto "Hello".
+veritas z esto "".
 scribere z.
+
+numerus test esto "2137".
+scribere test.
 
 fractio y esto "Hello".
 scribere y.
