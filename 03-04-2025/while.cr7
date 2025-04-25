@@ -1,2 +1,5 @@
-dum i minor quam 10: scribere i. scribere "Test".
+fractio i esto 40,5.
+dum i minor quam 10: 
+	scribere i. 
+	scribere "Test".
 scribere "Hello".
