@@ -5,20 +5,23 @@ grammar Scriptorium;
 start: (action|NL)* EOF;
 
 action: variableDeclaration
+      | variableDefinition
       | if
       | forLoop
       | whileLoop
       | function
       | print
       | errorStatement
+      | COMMENT
       ;
 
 expr: varExpr  
     | boolExpr
-    | intExpr       
     | floatExpr     
+    | intExpr       
     | stringExpr       
-    | nullExpr          
+    | nullExpr      
+    | inputExpr    
     ;
 
 varExpr: NAME ;
@@ -29,27 +32,24 @@ stringExpr
     | varExpr                     #StringVar
     ;
 
-intExpr: INT                                    #Int
-       | intExpr POW intExpr                    #IntPow
-       | intExpr op=(MUL | DIV) intExpr         #IntMulDiv
-       | intExpr op=(ADD | SUB) intExpr         #IntAddSub
-       | intExpr MOD intExpr                    #IntMod
-       | varExpr                                #IntVar
-       ;
-
-floatExpr: FLOAT                                      #Float
-         | floatExpr POW floatExpr                    #FloatPow
-         | floatExpr op=(MUL | DIV | FDIV) floatExpr  #FloatMulDiv
-         | floatExpr op=(ADD | SUB) floatExpr         #FloatAddSub
-         | floatExpr MOD floatExpr                    #FloatMod
-         | varExpr                                    #FloatVar
-         ;
+numericExpr: INT                                        #NumericInt
+           | FLOAT                                      #NumericFloat
+           | LP numericExpr RP                          #NumericBrackets
+           | op=(PLUS|MINUS) numericExpr                #NumericPlusMinus
+           | numericExpr POW numericExpr                #NumericPow
+           | numericExpr op=(MUL|DIV|FDIV) numericExpr  #NumericMulDiv
+           | numericExpr op=(ADD|SUB) numericExpr       #NumericAddSub
+           | numericExpr MOD numericExpr                #NumericMod
+           | varExpr                                    #NumericVar
+           ;
+intExpr: numericExpr #Int ;
+floatExpr: numericExpr #Float ;
 
 boolExpr: BOOL                                              #Bool
         | NOT boolExpr                                      #BoolNot
+        | LP boolExpr RP                                    #BoolBrackets
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
-        | intExpr op=(LT|LE|GT|GE|EQ|NEQ) intExpr           #IntLogic
-        | floatExpr op=(LT|LE|GT|GE|EQ|NEQ) floatExpr       #FloatLogic
+        | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
         | boolExpr op=(AND|OR|EQ|NEQ) boolExpr              #BoolLogic
         | varExpr                                           #BoolVar
         ;
@@ -70,11 +70,9 @@ forLoop: FOR NAME FROM from=INT TO to=INT COLON (action|continueStatement|breakS
 breakStatement: BREAK DOT;
 continueStatement: CONTINUE DOT;
 
-variableDeclaration: type=INT_TYPE NAME IS (intExpr|nullExpr|inputExpr) DOT
-                   | type=FLOAT_TYPE NAME IS (floatExpr|nullExpr|inputExpr) DOT
-                   | type=STRING_TYPE NAME IS (stringExpr|nullExpr|inputExpr) DOT
-                   | type=BOOL_TYPE NAME IS (boolExpr|nullExpr|inputExpr) DOT
-                   ;
+variableDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) variableDefinition
+                   | varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME DOT ;
+variableDefinition: NAME IS expr DOT ;
 
 if: ifBlock ifElseBlock* elseBlock?;
 
@@ -107,8 +105,13 @@ ELSE: 'aliter' ;
 INPUT: 'rogare' ;
 PRINT: 'scribere' ;
 
-INT: '-'? [0-9]+ ;
-FLOAT: '-'? [0-9]+ ',' [0-9]+ ;
+PLUS: 'positivum' 
+    | '+' ;
+MINUS: 'negans' 
+     | '-' ;
+
+INT: (PLUS|MINUS)? [0-9]+ ;
+FLOAT: (PLUS|MINUS)? [0-9]+ ',' [0-9]+ ;
 fragment ESC: '\\' ["\\] ;
 STRING: '"' (ESC | ~["\\\n])* '"' ;
 BOOL: ('verum'|'falsum') ;
@@ -149,6 +152,8 @@ LP: '(' ;
 RP: ')' ;
 
 NAME: [a-z_]+[a-zA-Z0-9_]* ;
+
+COMMENT: '//' .*? NL -> channel(HIDDEN);
 
 WS: [ \t]+ -> channel(HIDDEN) ;
 NL: '\r'? '\n';

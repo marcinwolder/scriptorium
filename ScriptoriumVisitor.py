@@ -2,12 +2,14 @@ import math
 
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
+from var import Var
 
 class Visitor(ScriptoriumVisitor):
-    var_map = dict()
-    listener = None
-    def __init__(self, listener):
-        self.listener = listener
+    var_map = {}
+    recursion_level = 0
+
+    def __init__(self, var_map):
+        self.var_map = var_map
         super().__init__()
 
     # PRINT
@@ -32,52 +34,31 @@ class Visitor(ScriptoriumVisitor):
     def visitStringAdd(self, ctx):
         return self.visit(ctx.stringExpr(0))+self.visit(ctx.stringExpr(1))
 
-    # INT
+    # NUMERIC
 
-    def visitInt(self, ctx):
-        return int(ctx.INT().getText())
-
-    def visitIntPow(self, ctx):
-        primary = self.visit(ctx.intExpr(0))
-        secondary = self.visit(ctx.intExpr(1))
-        return int(math.pow(primary, secondary))
-            
-    def visitIntMulDiv(self, ctx):
-        primary = self.visit(ctx.intExpr(0))
-        secondary = self.visit(ctx.intExpr(1))
-        match ctx.op.type:
-            case ScriptoriumParser.MUL:
-                return primary * secondary
-            case ScriptoriumParser.DIV:
-                return primary // secondary
-
-    def visitIntAddSub(self, ctx):
-        primary = self.visit(ctx.intExpr(0))
-        secondary = self.visit(ctx.intExpr(1))
-        match ctx.op.type:
-            case ScriptoriumParser.ADD:
-                return primary+secondary
-            case ScriptoriumParser.SUB:
-                return primary-secondary
-
-    def visitIntMod(self, ctx):
-        primary = self.visit(ctx.intExpr(0))
-        secondary = self.visit(ctx.intExpr(1))
-        return primary % secondary
-    
-    # FLOAT
-    
-    def visitFloat(self, ctx):
+    def visitNumericInt(self, ctx):
+        return float(ctx.INT().getText())
+    def visitNumericFloat(self, ctx):
         return float(ctx.FLOAT().getText().replace(",", "."))
 
-    def visitFloatPow(self, ctx):
-        primary = self.visit(ctx.floatExpr(0))
-        secondary = self.visit(ctx.floatExpr(1))
+    def visitNumericPlusMinus(self, ctx):
+        match ctx.op.type:
+            case ScriptoriumParser.PLUS:
+                return self.visit(ctx.numericExpr())
+            case ScriptoriumParser.MINUS:
+                return -self.visit(ctx.numericExpr())
+
+    def visitNumericBrackets(self, ctx):
+        return self.visit(ctx.numericExpr())
+
+    def visitNumericPow(self, ctx):
+        primary = self.visit(ctx.numericExpr(0))
+        secondary = self.visit(ctx.numericExpr(1))
         return math.pow(primary, secondary)
             
-    def visitFloatMulDiv(self, ctx):
-        primary = self.visit(ctx.floatExpr(0))
-        secondary = self.visit(ctx.floatExpr(1))
+    def visitNumericMulDiv(self, ctx):
+        primary = self.visit(ctx.numericExpr(0))
+        secondary = self.visit(ctx.numericExpr(1))
         match ctx.op.type:
             case ScriptoriumParser.MUL:
                 return primary * secondary
@@ -86,20 +67,37 @@ class Visitor(ScriptoriumVisitor):
             case ScriptoriumParser.FDIV:
                 return primary // secondary
 
-    def visitFloatAddSub(self, ctx):
-        primary = self.visit(ctx.floatExpr(0))
-        secondary = self.visit(ctx.floatExpr(1))
+    def visitNumericAddSub(self, ctx):
+        primary = self.visit(ctx.numericExpr(0))
+        secondary = self.visit(ctx.numericExpr(1))
         match ctx.op.type:
             case ScriptoriumParser.ADD:
-                return primary + secondary
+                return primary+secondary
             case ScriptoriumParser.SUB:
-                return primary - secondary
+                return primary-secondary
 
-    def visitFloatMod(self, ctx):
-        primary = self.visit(ctx.floatExpr(0))
-        secondary = self.visit(ctx.floatExpr(1))
+    def visitNumericMod(self, ctx):
+        primary = self.visit(ctx.numericExpr(0))
+        secondary = self.visit(ctx.numericExpr(1))
         return primary % secondary
     
+    # INT
+
+    def visitInt(self, ctx):
+        return int(self.visit(ctx.numericExpr()))
+    
+    # FLOAT
+    
+    def visitFloat(self, ctx):
+        return float(str(self.visit(ctx.numericExpr())).replace(",", "."))   
+
+    # NULL
+    
+    def visitNull(self, ctx):
+        return None
+
+    # BOOL
+
     def visitBool(self, ctx):
         match ctx.BOOL().getText():
             case 'verum':
@@ -107,9 +105,9 @@ class Visitor(ScriptoriumVisitor):
             case 'falsum':
                 return False
             
-    def visitNull(self, ctx):
-        return None
-            
+    def visitBoolBrackets(self, ctx):
+        return self.visit(ctx.boolExpr())
+
     def visitStringLogic(self, ctx):
         primary:str = self.visit(ctx.stringExpr(0))
         secondary:str = self.visit(ctx.stringExpr(1))
@@ -126,27 +124,10 @@ class Visitor(ScriptoriumVisitor):
                 return primary <= secondary
             case ScriptoriumParser.GE:
                 return primary >= secondary
-            
-    def visitIntLogic(self, ctx):
-        primary:int = self.visit(ctx.intExpr(0))
-        secondary:int = self.visit(ctx.intExpr(1))
-        match ctx.op.type:
-            case ScriptoriumParser.EQ:
-                return primary == secondary
-            case ScriptoriumParser.NEQ:
-                return primary != secondary
-            case ScriptoriumParser.LT:
-                return primary < secondary
-            case ScriptoriumParser.GT:
-                return primary > secondary
-            case ScriptoriumParser.LE:
-                return primary <= secondary
-            case ScriptoriumParser.GE:
-                return primary >= secondary
 
-    def visitFloatLogic(self, ctx):
-        primary:float = self.visit(ctx.floatExpr(0))
-        secondary:float = self.visit(ctx.floatExpr(1))
+    def visitNumericLogic(self, ctx):
+        primary:float = self.visit(ctx.numericExpr(0))
+        secondary:float = self.visit(ctx.numericExpr(1))
         match ctx.op.type:
             case ScriptoriumParser.EQ:
                 return primary == secondary
@@ -178,42 +159,38 @@ class Visitor(ScriptoriumVisitor):
         primary:bool = self.visit(ctx.boolExpr())
         return not primary
 
-    def visitVarExpr(self, ctx):
-        var = None;
-        try:
-            var = self.var_map[ctx.NAME().getText()]
-        except:
-            error_msg = f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{ctx.NAME().getText()}\""
-            raise Exception(error_msg)
-        return var
+    # VAR
     
+    def visitVariableDefinition(self, ctx):
+        def changeOrAppend(list: list[any], index: int, value: any):
+            try: var.value[self.recursion_level] = value
+            except: var.value.append(value)
+
+        parentCtx = ctx.parentCtx.parentCtx
+        parentCtx = parentCtx if type(parentCtx) != ScriptoriumParser.ActionContext else parentCtx.parentCtx
+
+        var: Var = self.var_map[parentCtx][ctx.NAME().getText()]
+
+        value = self.visit(ctx.expr())
+        try:
+            match var.typeId:
+                case ScriptoriumParser.INT_TYPE:
+                    value = trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value
+                    changeOrAppend(var.value, self.recursion_level, int(float(value)))
+                case ScriptoriumParser.FLOAT_TYPE:
+                    value = trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value
+                    changeOrAppend(var.value, self.recursion_level, float(value))
+                case ScriptoriumParser.STRING_TYPE:
+                    changeOrAppend(var.value, self.recursion_level, str(value))
+                case ScriptoriumParser.BOOL_TYPE:
+                    changeOrAppend(var.value, self.recursion_level, bool(value))
+        except:
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error")
+
+    def visitVarExpr(self, ctx):
+        return Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level)
+    
+    # INPUT
+
     def visitInputExpr(self, ctx):
         return input(self.visit(ctx.printExpr()))
-
-    def visitVariableDeclaration(self, ctx):
-        value = None
-        if ctx.NAME().getText() in self.var_map:
-            error_msg = f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable cannot be declared multiple times"
-            raise Exception(error_msg)
-        if ctx.nullExpr() is not None:
-            self.var_map[ctx.NAME().getText()] = None
-            return
-        if ctx.inputExpr() is not None:
-            value = self.visit(ctx.inputExpr())
-        try:
-            match ctx.type_.type:
-                case ScriptoriumParser.INT_TYPE:
-                    value = value or self.visit(ctx.intExpr())
-                    self.var_map[ctx.NAME().getText()] = int(value)
-                case ScriptoriumParser.FLOAT_TYPE:
-                    value = value or self.visit(ctx.floatExpr())
-                    self.var_map[ctx.NAME().getText()] = float(trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value)
-                case ScriptoriumParser.STRING_TYPE:
-                    value = value or self.visit(ctx.stringExpr())
-                    self.var_map[ctx.NAME().getText()] = str(value)
-                case ScriptoriumParser.BOOL_TYPE:
-                    value = value or self.visit(ctx.boolExpr())
-                    self.var_map[ctx.NAME().getText()] = bool(value)
-        except:
-            error_msg = f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error"
-            raise Exception(error_msg)
