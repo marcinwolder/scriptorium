@@ -107,7 +107,7 @@ variableDefinition: NAME IS expr DOT NL;
 if: ifBlock ifElseBlock* elseBlock?;
 
 ifBlock: IF boolExpr COLON actionBlock ;
-ifElseBlock: ELSE IF boolExpr COLON actionBlock ;
+ifElseBlock: ELSE_IF boolExpr COLON actionBlock ;
 elseBlock: ELSE COLON actionBlock ;
 actionBlock: INDENT action+ DEDENT ;
 
@@ -131,10 +131,12 @@ FROM: 'ex' ;
 TO: 'ad' ;
 BREAK: 'exire' ;
 CONTINUE: 'perge' ;
+ELSE_IF: 'aliter si';
 IF: 'si' ;
 ELSE: 'aliter' ;
 INPUT: 'rogare' ;
 PRINT: 'scribere' ;
+DO: 'facere' ;
 
 PLUS: 'positivum' 
     | '+' ;
