@@ -197,12 +197,6 @@ class Visitor(ScriptoriumVisitor):
 
     # IFS
     
-    def visitActionBlock(self, ctx):
-        result = None
-        for statement in ctx.action():
-            result = self.visit(statement)
-        return result
-
     def visitIf(self, ctx):
         if self.visit(ctx.ifBlock().boolExpr()):
             return self.visit(ctx.ifBlock().actionBlock())

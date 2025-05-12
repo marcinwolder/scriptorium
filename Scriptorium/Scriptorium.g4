@@ -136,7 +136,6 @@ IF: 'si' ;
 ELSE: 'aliter' ;
 INPUT: 'rogare' ;
 PRINT: 'scribere' ;
-DO: 'facere' ;
 
 PLUS: 'positivum' 
     | '+' ;
@@ -188,7 +187,7 @@ NAME: [a-z_]+[a-zA-Z0-9_]* ;
 
 COMMENT: '//' .*? NL -> channel(HIDDEN);
 
-NL: ('\r'? '\n') [ \t]*;
+NL: ('\r'? '\n') '\t'*;
 WS: [ ]+ -> skip;
 // WS: [ ]+ -> channel(HIDDEN) ;
 // NL: ('\r'? '\n');
