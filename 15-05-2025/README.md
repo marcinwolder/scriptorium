@@ -17,6 +17,9 @@ Przygotowano na poprzedni etap.
 
 #### 4. Odpowiednik pętli for/while
 
+* [while](./while.cr7)
+* [for](./for.cr7)
+
 #### 5. Porównania (==, !=) dla typu logicznego
 
 #TODO: Przygotowano no poprzedni etap

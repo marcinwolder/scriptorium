@@ -221,25 +221,42 @@ class Visitor(ScriptoriumVisitor):
         if var_name not in self.var_map[parentCtx]:
             self.var_map[parentCtx][var_name] = Var(typeId=ScriptoriumParser.INT_TYPE)
 
-        #var = self.var_map[parentCtx][var_name]
         var: Var = Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level, True)
 
         for i in range(start, end+1):
             var.value = [i]
-            for action in ctx.loopBlock().children:
-                self.visit(action)
-                if type(action) == ScriptoriumParser.BreakStatementContext:
-                    return
-                elif type(action) == ScriptoriumParser.ContinueStatementContext:
-                    break
+            for action in ctx.actionBlock().children:
+                try:
+                    self.visit(action)
+                except Exception as e:
+                    if e.args[0]=='break':
+                        return
+                    elif e.args[0]=='continue':
+                        break
+                    else:
+                        raise e
 
     # WHILE LOOP
 
     def visitWhileLoop(self, ctx):
         while(self.visit(ctx.boolExpr())):
-            for action in ctx.loopBlock().children:
-                result = self.visit(action)
-                if type(action) == ScriptoriumParser.BreakStatementContext:
-                    return
-                elif type(action) == ScriptoriumParser.ContinueStatementContext:
-                    break
+            for action in ctx.actionBlock().children:
+                try:
+                    self.visit(action)
+                except Exception as e:
+                    if e.args[0]=='break':
+                        return
+                    elif e.args[0]=='continue':
+                        break
+                    else:
+                        raise e
+
+    # BREAK
+
+    def visitBreakStatement(self, ctx):
+        raise Exception("break")
+    
+    # CONTINUE
+
+    def visitContinueStatement(self, ctx):
+        raise Exception("continue")

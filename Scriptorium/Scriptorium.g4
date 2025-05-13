@@ -41,6 +41,9 @@ action: variableDeclaration
       | function
       | print
       | errorStatement
+      | returnStatement
+      | continueStatement
+      | breakStatement
       | COMMENT
       ;
 
@@ -88,14 +91,12 @@ nullExpr: NULL #Null ;
 errorStatement: ERROR printExpr DOT NL;
 
 funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
-function: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON funcBlock ;
-funcBlock: INDENT (action|returnStatement)+ DEDENT ;
+function: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON actionBlock ;
 
 returnStatement: RETURN expr DOT NL;
 
-whileLoop: WHILE boolExpr COLON loopBlock ;
-forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;
-loopBlock: INDENT (action|continueStatement|breakStatement)+ DEDENT ;
+whileLoop: WHILE boolExpr COLON actionBlock ;
+forLoop: FOR NAME FROM from=INT TO to=INT COLON actionBlock ;
 
 breakStatement: BREAK DOT NL;
 continueStatement: CONTINUE DOT NL;
@@ -109,6 +110,7 @@ if: ifBlock ifElseBlock* elseBlock?;
 ifBlock: IF boolExpr COLON actionBlock ;
 ifElseBlock: ELSE_IF boolExpr COLON actionBlock ;
 elseBlock: ELSE COLON actionBlock ;
+
 actionBlock: INDENT action+ DEDENT ;
 
 inputExpr: INPUT printExpr ;
