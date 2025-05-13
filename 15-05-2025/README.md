@@ -22,7 +22,8 @@ Przygotowano na poprzedni etap.
 
 #### 5. Porównania (==, !=) dla typu logicznego
 
-#TODO: Przygotowano no poprzedni etap
+Przygotowano no poprzedni etap
+* [veritas](./veritas.cr7)
 
 #### 6. Obsługę definiowania i wywoływania funkcji. Funkcja powinna pozwalać na zwracanie rezultatu (powinna istnieć też możliwość definiowania funkcji zwracającej void) i przyjmować zadeklarowaną liczbę oraz typy argumentów.
 
