@@ -194,10 +194,6 @@ class Visitor(ScriptoriumVisitor):
     def visitFuncBlock(self, ctx):
         ...
 
-    # LOOPS
-
-    def visitLoopBlock(self, ctx):
-        ...
 
     # IFS
     
@@ -218,3 +214,38 @@ class Visitor(ScriptoriumVisitor):
         if ctx.elseBlock():
             return self.visit(ctx.elseBlock().actionBlock())
 
+    # FOR LOOP
+
+    def visitForLoop(self, ctx):
+        var_name = ctx.NAME().getText()
+        start = int(ctx.from_.text)
+        end = int(ctx.to.text)
+
+        parentCtx = ctx.parentCtx
+        self.var_map.setdefault(parentCtx, {})
+
+        if var_name not in self.var_map[parentCtx]:
+            self.var_map[parentCtx][var_name] = Var(typeId=ScriptoriumParser.INT_TYPE)
+
+        #var = self.var_map[parentCtx][var_name]
+        var: Var = Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level, True)
+
+        for i in range(start, end+1):
+            var.value = [i]
+            for action in ctx.loopBlock().children:
+                self.visit(action)
+                if type(action) == ScriptoriumParser.BreakStatementContext:
+                    return
+                elif type(action) == ScriptoriumParser.ContinueStatementContext:
+                    break
+
+    # WHILE LOOP
+
+    def visitWhileLoop(self, ctx):
+        while(self.visit(ctx.boolExpr())):
+            for action in ctx.loopBlock().children:
+                result = self.visit(action)
+                if type(action) == ScriptoriumParser.BreakStatementContext:
+                    return
+                elif type(action) == ScriptoriumParser.ContinueStatementContext:
+                    break
