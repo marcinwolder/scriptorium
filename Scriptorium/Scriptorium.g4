@@ -139,10 +139,8 @@ ELSE: 'aliter' ;
 INPUT: 'rogare' ;
 PRINT: 'scribere' ;
 
-PLUS: 'positivum' 
-    | '+' ;
-MINUS: 'negans' 
-     | '-' ;
+PLUS: 'positivum' ;
+MINUS: 'negans' ;
 
 INT: (PLUS|MINUS)? [0-9]+ ;
 FLOAT: (PLUS|MINUS)? [0-9]+ ',' [0-9]+ ;
