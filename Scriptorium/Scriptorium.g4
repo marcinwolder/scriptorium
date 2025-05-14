@@ -39,7 +39,7 @@ action: variableDeclaration
       | forLoop
       | whileLoop
       | functionDeclaration
-      | functionInvocation
+      | functionInvocation DOT NL
       | print
       | errorStatement
       | returnStatement
@@ -54,6 +54,7 @@ expr: boolExpr
     | stringExpr       
     | nullExpr      
     | inputExpr
+    | functionInvocation
     | varExpr    
     ;
 
@@ -95,7 +96,7 @@ errorStatement: ERROR printExpr DOT NL;
 
 funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
 functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam? (COMMA funcParam)* RP COLON actionBlock ;
-functionInvocation: NAME LP expr? (COMMA expr)* RP DOT NL ;
+functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP ;
 
 returnStatement: RETURN expr? DOT NL ;
 

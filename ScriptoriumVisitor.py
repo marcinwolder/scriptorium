@@ -199,7 +199,8 @@ class Visitor(ScriptoriumVisitor):
 
     def visitFunctionInvocation(self, ctx):
         function_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map)
-        parameters = [var for var in self.var_map[function_var.function_ctx].values() if type(var) == ParamVar]
+        parameters = self.var_map[function_var.function_ctx].values() if function_var.function_ctx in self.var_map.keys() else []
+        parameters = [var for var in parameters if type(var) == ParamVar]
         arguments = ctx.expr()
         if len(parameters) != len(arguments):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - wrong number of arguments - got: {len(arguments)}, expected: {len(parameters)}")
