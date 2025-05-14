@@ -1,6 +1,7 @@
 from Scriptorium.ScriptoriumListener import ScriptoriumListener
+from Scriptorium.ScriptoriumLexer import ScriptoriumLexer
 
-from var import Var
+from var import FuncVar, Var
 
 class VariableListener(ScriptoriumListener):
     var_map = {} # {parentCtx -> {var_name -> Var(type, value[])}}
@@ -10,21 +11,31 @@ class VariableListener(ScriptoriumListener):
         super().__init__()
 
     def exitVariableDeclaration(self, ctx):
-        self.var_map.setdefault(ctx.parentCtx.parentCtx, {})
-
+        scope_ctx = Var.nearest_scope(ctx)
         varNameNode = ctx.NAME() if ctx.NAME() else ctx.variableDefinition().NAME()
 
-        if varNameNode.getText() in self.var_map[ctx.parentCtx.parentCtx].keys():
+        self.var_map.setdefault(scope_ctx, {})
+        if varNameNode.getText() in self.var_map[scope_ctx].keys():
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
-        else:
-            self.var_map[ctx.parentCtx.parentCtx][varNameNode.getText()] = Var(typeId=ctx.varType.type)
+        
+        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ctx.varType.type)
 
     def exitFuncParam(self, ctx):
-        self.var_map.setdefault(ctx.parentCtx, {})
-
+        scope_ctx = Var.nearest_scope(ctx)
         varNameNode = ctx.NAME()
-
-        if varNameNode.getText() in self.var_map[ctx.parentCtx].keys():
+        
+        self.var_map.setdefault(scope_ctx, {})
+        if varNameNode.getText() in self.var_map[scope_ctx].keys():
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
-        else:
-            self.var_map[ctx.parentCtx][varNameNode.getText()] = Var(typeId=ctx.varType.type)
+        
+        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ctx.varType.type)
+
+    def exitFunctionDeclaration(self, ctx):
+        scope_ctx = Var.nearest_scope(ctx.parentCtx)
+        varNameNode = ctx.NAME()
+        
+        self.var_map.setdefault(scope_ctx, {})
+        if varNameNode.getText() in self.var_map[scope_ctx].keys():
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
+        
+        self.var_map[scope_ctx][varNameNode.getText()] = FuncVar(type_id=ScriptoriumLexer.FUNCTION, return_type=ctx.varType.type, function_ctx=ctx)

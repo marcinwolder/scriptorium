@@ -3,8 +3,18 @@ from typing import List
 
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
-from var import Var
+from var import FuncVar, Var
 
+def cast_to_type(value, type_id):
+    if type_id == ScriptoriumParser.INT_TYPE:
+        return int(float(trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value))
+    elif type_id == ScriptoriumParser.FLOAT_TYPE:
+        return float(trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value)
+    elif type_id == ScriptoriumParser.STRING_TYPE:
+        return str(value)
+    elif type_id == ScriptoriumParser.BOOL_TYPE:
+        return bool(value)
+    
 class Visitor(ScriptoriumVisitor):
     var_map = {}
     recursion_level = 0
@@ -160,34 +170,31 @@ class Visitor(ScriptoriumVisitor):
         return not primary
 
     # VAR
-    
+
     def visitVariableDefinition(self, ctx):
         def changeOrAppend(list: List[any], index: int, value: any):
             try: var.value[self.recursion_level] = value
             except: var.value.append(value)
 
-        parentCtx = ctx.parentCtx.parentCtx
-        parentCtx = parentCtx if type(parentCtx) != ScriptoriumParser.ActionContext else parentCtx.parentCtx
-
-        var: Var = Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level, True)
+        var: Var = Var.nearest_scope_variable(ctx, self.var_map, self.recursion_level, True)
 
         value = self.visit(ctx.expr())
         try:
-            if var.typeId == ScriptoriumParser.INT_TYPE:
+            if var.type_id == ScriptoriumParser.INT_TYPE:
                 value = trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value
                 changeOrAppend(var.value, self.recursion_level, int(float(value)))
-            elif var.typeId == ScriptoriumParser.FLOAT_TYPE:
+            elif var.type_id == ScriptoriumParser.FLOAT_TYPE:
                 value = trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value
                 changeOrAppend(var.value, self.recursion_level, float(value))
-            elif var.typeId == ScriptoriumParser.STRING_TYPE:
+            elif var.type_id == ScriptoriumParser.STRING_TYPE:
                 changeOrAppend(var.value, self.recursion_level, str(value))
-            elif var.typeId == ScriptoriumParser.BOOL_TYPE:
+            elif var.type_id == ScriptoriumParser.BOOL_TYPE:
                 changeOrAppend(var.value, self.recursion_level, bool(value))
-        except:
-            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error")
+        except Exception as e:
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
 
     def visitVarExpr(self, ctx):
-        return Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level)
+        return Var.nearest_scope_variable(ctx, self.var_map, self.recursion_level)
     
     # INPUT
 
@@ -196,7 +203,25 @@ class Visitor(ScriptoriumVisitor):
     
     # FUNCTIONS
 
-    # FIXME: FIXXXXX!!!!!!!
+    def visitFunctionInvocation(self, ctx):
+        function_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map, self.recursion_level)
+        parameters = self.var_map[function_var.function_ctx].values()
+        arguments = ctx.expr()
+        if len(parameters) != len(arguments):
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - wrong number of arguments - got: {len(arguments)}, expected: {len(parameters)}")
+        for param, expr in zip(parameters, ctx.expr()):
+            try:
+                casted_value = cast_to_type(expr.getText(), param.type_id)
+                Var.change_or_append_value(param, self.recursion_level, casted_value)
+            except Exception as e:
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
+            
+        print(self.var_map)
+        self.visit(function_var.function_ctx.actionBlock())
+
+    def visitFunctionDeclaration(self, ctx):
+        # print(ctx.funcParam())
+        ...
 
     # IFS
     
@@ -211,6 +236,24 @@ class Visitor(ScriptoriumVisitor):
         if ctx.elseBlock():
             return self.visit(ctx.elseBlock().actionBlock())
 
+    # LOOPS
+
+    def visitBreakStatement(self, ctx):
+        raise Exception("break")
+    
+    def visitContinueStatement(self, ctx):
+        raise Exception("continue")
+
+    def visitLoopBlock(self, ctx):
+        for action in ctx.actionBlock().children:
+            try:
+                self.visit(action)
+            except Exception as e:
+                if e.args[0] == 'continue':
+                    return
+                else:
+                    raise e
+
     # FOR LOOP
 
     def visitForLoop(self, ctx):
@@ -224,20 +267,17 @@ class Visitor(ScriptoriumVisitor):
         if var_name not in self.var_map[parentCtx]:
             self.var_map[parentCtx][var_name] = Var(typeId=ScriptoriumParser.INT_TYPE)
 
-        var: Var = Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level, True)
+        var: Var = Var.nearest_scope_variable(ctx, self.var_map, self.recursion_level, True)
 
         for i in range(start, end+1):
             var.value = [i]
-            for action in ctx.actionBlock().children:
-                try:
-                    self.visit(action)
-                except Exception as e:
-                    if e.args[0]=='break':
-                        return
-                    elif e.args[0]=='continue':
-                        break
-                    else:
-                        raise e
+            try:
+                self.visit(ctx.loopBlock())
+            except Exception as e:
+                if e.args[0] == 'break':
+                    return
+                else: 
+                    raise e
 
     # WHILE LOOP
 
@@ -253,13 +293,3 @@ class Visitor(ScriptoriumVisitor):
                         break
                     else:
                         raise e
-
-    # BREAK
-
-    def visitBreakStatement(self, ctx):
-        raise Exception("break")
-    
-    # CONTINUE
-
-    def visitContinueStatement(self, ctx):
-        raise Exception("continue")

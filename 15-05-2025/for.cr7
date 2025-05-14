@@ -1,10 +1,10 @@
 numerus x esto 0.
 repetere i ex 1 ad 10:
 	x esto x adde 1.
-	perge.
+	//perge.
 	scribere i. 
 	si i maior quam 5:
-		//scribere i.
+		scribere i.
 		exire.
 scribere "====".
 //scribere i.

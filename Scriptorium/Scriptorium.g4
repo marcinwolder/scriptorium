@@ -94,13 +94,14 @@ nullExpr: NULL #Null ;
 errorStatement: ERROR printExpr DOT NL;
 
 funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
-functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON actionBlock ;
-functionInvocation: NAME LP funcParam (COMMA funcParam)* RP DOT NL ;
+functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam? (COMMA funcParam)* RP COLON actionBlock ;
+functionInvocation: NAME LP expr? (COMMA expr)* RP DOT NL ;
 
 returnStatement: RETURN expr DOT NL ;
 
-whileLoop: WHILE boolExpr COLON actionBlock ;
-forLoop: FOR NAME FROM from=INT TO to=INT COLON actionBlock ;
+whileLoop: WHILE boolExpr COLON loopBlock ;
+forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;
+loopBlock: actionBlock ;
 
 breakStatement: BREAK DOT NL;
 continueStatement: CONTINUE DOT NL;
@@ -189,7 +190,7 @@ RP: ')' ;
 
 NAME: [a-z_]+[a-zA-Z0-9_]* ;
 
-COMMENT: '//' .*? NL -> channel(HIDDEN);
+COMMENT: '\t'* '//' .*? NL -> channel(HIDDEN);
 
 NL: ('\r'? '\n') '\t'*;
 WS: [ ]+ -> skip;

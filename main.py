@@ -11,10 +11,14 @@ def main():
 
     input_stream = FileStream(sys.argv[1], encoding='utf-8')
     try:
+        # print(0)
+
         lexer = ScriptoriumLexer(input_stream)
         lexer.removeErrorListeners()
         lexer.addErrorListener(ErrorListener())
         token_stream = CommonTokenStream(lexer)
+
+        # print(1)
 
         parser = ScriptoriumParser(token_stream)
         parser.removeErrorListeners()
@@ -22,8 +26,12 @@ def main():
         parser.addParseListener(VariableListener(var_map))
         tree = parser.start()
 
+        # print(2, var_map)
+
         visitor = Visitor(var_map)
         visitor.visit(tree)
+
+        # print(3)
     except Exception as e:
         print(e)
 
