@@ -38,7 +38,8 @@ action: variableDeclaration
       | if
       | forLoop
       | whileLoop
-      | function
+      | functionDeclaration
+      | functionInvocation
       | print
       | errorStatement
       | returnStatement
@@ -80,9 +81,11 @@ floatExpr: numericExpr #Float ;
 boolExpr: BOOL                                              #Bool
         | NOT boolExpr                                      #BoolNot
         | LP boolExpr RP                                    #BoolBrackets
+        | boolExpr AND boolExpr                             #BoolAnd
+        | boolExpr OR boolExpr                              #BoolOr
+        | boolExpr op=(EQ|NEQ) boolExpr                     #BoolEqual
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
         | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
-        | boolExpr op=(AND|OR|EQ|NEQ) boolExpr              #BoolLogic
         | varExpr                                           #BoolVar
         ;
 
@@ -91,9 +94,10 @@ nullExpr: NULL #Null ;
 errorStatement: ERROR printExpr DOT NL;
 
 funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
-function: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON actionBlock ;
+functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON actionBlock ;
+functionInvocation: NAME LP funcParam (COMMA funcParam)* RP DOT NL ;
 
-returnStatement: RETURN expr DOT NL;
+returnStatement: RETURN expr DOT NL ;
 
 whileLoop: WHILE boolExpr COLON actionBlock ;
 forLoop: FOR NAME FROM from=INT TO to=INT COLON actionBlock ;

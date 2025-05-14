@@ -137,14 +137,20 @@ class Visitor(ScriptoriumVisitor):
         elif ctx.op.type == ScriptoriumParser.GE:
             return primary >= secondary
 
-    def visitBoolLogic(self, ctx):
+    def visitBoolAnd(self, ctx):
         primary:bool = self.visit(ctx.boolExpr(0))
         secondary:bool = self.visit(ctx.boolExpr(1))
-        if ctx.op.type == ScriptoriumParser.AND:
-            return primary and secondary
-        elif ctx.op.type == ScriptoriumParser.OR:
-            return primary or secondary
-        elif ctx.op.type == ScriptoriumParser.EQ:
+        return primary and secondary
+
+    def visitBoolOr(self, ctx):
+        primary:bool = self.visit(ctx.boolExpr(0))
+        secondary:bool = self.visit(ctx.boolExpr(1))
+        return primary or secondary
+
+    def visitBoolEqual(self, ctx):
+        primary:bool = self.visit(ctx.boolExpr(0))
+        secondary:bool = self.visit(ctx.boolExpr(1))
+        if ctx.op.type == ScriptoriumParser.EQ:
             return primary == secondary
         elif ctx.op.type == ScriptoriumParser.NEQ:
             return primary != secondary
@@ -164,7 +170,6 @@ class Visitor(ScriptoriumVisitor):
         parentCtx = parentCtx if type(parentCtx) != ScriptoriumParser.ActionContext else parentCtx.parentCtx
 
         var: Var = Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level, True)
-        # var: Var = self.var_map[parentCtx][ctx.NAME().getText()]
 
         value = self.visit(ctx.expr())
         try:
@@ -191,9 +196,7 @@ class Visitor(ScriptoriumVisitor):
     
     # FUNCTIONS
 
-    def visitFuncBlock(self, ctx):
-        ...
-
+    # FIXME: FIXXXXX!!!!!!!
 
     # IFS
     

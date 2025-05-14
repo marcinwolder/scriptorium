@@ -3,3 +3,7 @@ veritas y esto falsum.
 
 scribere x aequalis y.
 scribere x inaequale y.
+
+scribere "".
+scribere "Poprawka:".
+scribere verum aut falsum etiam falsum.
