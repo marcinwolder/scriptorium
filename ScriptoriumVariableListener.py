@@ -16,9 +16,10 @@ class VariableListener(ScriptoriumListener):
 
         self.var_map.setdefault(scope_ctx, {})
         if varNameNode.getText() in self.var_map[scope_ctx].keys():
-            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
+            existing_var: Var = self.var_map[scope_ctx][varNameNode.getText()]
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable or function \"{varNameNode.getText()}\" declaration (delcared in {existing_var.declaration_position[0]}:{existing_var.declaration_position[1]})")
         
-        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ctx.varType.type)
+        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ctx.varType.type, declaration_position=(ctx.start.line, ctx.start.column))
 
     def exitFuncParam(self, ctx):
         scope_ctx = Var.nearest_scope(ctx)
@@ -26,9 +27,10 @@ class VariableListener(ScriptoriumListener):
         
         self.var_map.setdefault(scope_ctx, {})
         if varNameNode.getText() in self.var_map[scope_ctx].keys():
-            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
+            existing_var: Var = self.var_map[scope_ctx][varNameNode.getText()]
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable or function \"{varNameNode.getText()}\" declaration (delcared in {existing_var.declaration_position[0]}:{existing_var.declaration_position[1]})")
         
-        self.var_map[scope_ctx][varNameNode.getText()] = ParamVar(type_id=ctx.varType.type)
+        self.var_map[scope_ctx][varNameNode.getText()] = ParamVar(type_id=ctx.varType.type, declaration_position=(ctx.start.line, ctx.start.column))
 
     def exitFunctionDeclaration(self, ctx):
         scope_ctx = Var.nearest_scope(ctx.parentCtx)
@@ -36,9 +38,10 @@ class VariableListener(ScriptoriumListener):
         
         self.var_map.setdefault(scope_ctx, {})
         if varNameNode.getText() in self.var_map[scope_ctx].keys():
-            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
+            existing_var: Var = self.var_map[scope_ctx][varNameNode.getText()]
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable or function \"{varNameNode.getText()}\" declaration (delcared in {existing_var.declaration_position[0]}:{existing_var.declaration_position[1]})")
         
-        self.var_map[scope_ctx][varNameNode.getText()] = FuncVar(type_id=ScriptoriumLexer.FUNCTION, return_type=ctx.varType.type, function_ctx=ctx)
+        self.var_map[scope_ctx][varNameNode.getText()] = FuncVar(type_id=ScriptoriumLexer.FUNCTION, return_type=ctx.varType.type, function_ctx=ctx, declaration_position=(ctx.start.line, ctx.start.column))
 
     def exitForLoop(self, ctx):
         scope_ctx = Var.nearest_scope(ctx)
@@ -46,6 +49,7 @@ class VariableListener(ScriptoriumListener):
         
         self.var_map.setdefault(scope_ctx, {})
         if varNameNode.getText() in self.var_map[scope_ctx].keys():
-            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
+            existing_var: Var = self.var_map[scope_ctx][varNameNode.getText()]
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable or function \"{varNameNode.getText()}\" declaration (delcared in {existing_var.declaration_position[0]}:{existing_var.declaration_position[1]})")
         
-        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ScriptoriumLexer.INT_TYPE)
+        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ScriptoriumLexer.INT_TYPE, declaration_position=(ctx.start.line, ctx.start.column))

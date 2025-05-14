@@ -279,13 +279,10 @@ class Visitor(ScriptoriumVisitor):
 
     def visitWhileLoop(self, ctx):
         while(self.visit(ctx.boolExpr())):
-            for action in ctx.actionBlock().children:
-                try:
-                    self.visit(action)
-                except Exception as e:
-                    if e.args[0]=='break':
-                        return
-                    elif e.args[0]=='continue':
-                        break
-                    else:
-                        raise e
+            try:
+                self.visit(ctx.loopBlock())
+            except Exception as e:
+                if e.args[0] == 'break':
+                    return
+                else: 
+                    raise e

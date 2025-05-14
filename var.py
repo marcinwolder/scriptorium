@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 
 
@@ -54,10 +54,12 @@ class Var:
 
     type_id: int
     value: List[any]
+    declaration_position: Tuple[int, int]
 
-    def __init__(self, type_id: int):
+    def __init__(self, type_id: int, declaration_position: Tuple[int, int]):
         self.type_id = type_id
         self.value = []
+        self.declaration_position = declaration_position
 
     def __str__(self):
         return f"<Var: typeId={self.type_id}, value={self.value}>"
@@ -66,8 +68,8 @@ class Var:
         return self.__str__()
     
 class FuncVar(Var):
-    def __init__(self, type_id: int, return_type: int, function_ctx):
-        super().__init__(type_id)
+    def __init__(self, type_id: int, return_type: int, function_ctx, declaration_position: Tuple[int, int]):
+        super().__init__(type_id, declaration_position)
         self.return_type = return_type
         self.function_ctx = function_ctx
         self.recursion_level = 0

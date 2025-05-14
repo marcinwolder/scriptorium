@@ -1,5 +1,5 @@
-numerus x esto -6.
-numerus y esto -6.
+numerus x esto negans 6.
+numerus y esto negans 6.
 
 si x aequalis y:
 	scribere "x == y".

@@ -5,5 +5,5 @@ nihil munus hello(sententia name, numerus age):
 		scribere name.
 	test("HAHAHA").
 
-hello("Marcin", 22).
-hello("Staszek", 20).
+hello("Marcin" et 22).
+hello("Staszek" et 20).

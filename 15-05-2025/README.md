@@ -2,7 +2,11 @@
 
 ### Poprawiono:
 
-1. Dodano numer lini pierwszej deklaracji zmiennej #TODO:
+1. Dodano numer lini pierwszej deklaracji zmiennej/funkcji
+    * [redeclaration.cr7](./redeclaration.cr7)
+    * [redeclaration_func.cr7](./redeclaration_func.cr7)
+2. Naprawiono błąd z kolejnością wykonywania działań.
+    * [veritas.cr7](./veritas.cr7)
 
 ### Należy rozszerzyć implementację swojego języka o następujące elementy:
 
@@ -12,9 +16,7 @@ Przygotowano na poprzedni etap.
 
 #### 2. Podstawowe operacje logiczne (and, or, not, nawiasowanie) na zmiennych logicznych oraz porównywanie zmiennych typu numerycznego (<, > , ==, !=) co w wyniku powinno dawać typ logiczny
 
-Naprawiono błąd z kolejnością wykonywania działań.
-
-[veritas.cr7](./veritas.cr7)
+* [veritas.cr7](./veritas.cr7)
 
 #### 3. Odpowiednik instrukcji warunkowej if/else
 
@@ -33,4 +35,6 @@ Przygotowano no poprzedni etap
 
 #### 6. Obsługę definiowania i wywoływania funkcji. Funkcja powinna pozwalać na zwracanie rezultatu (powinna istnieć też możliwość definiowania funkcji zwracającej void) i przyjmować zadeklarowaną liczbę oraz typy argumentów.
 
-#TODO: Zmienić gramatykę i zrobić realizację
+* [func.cr7](./func.cr7)
+* [func2.cr7](./func2.cr7)
+* [func3.cr7](./func3.cr7)
