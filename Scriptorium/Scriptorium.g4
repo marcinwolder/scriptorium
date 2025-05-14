@@ -38,9 +38,13 @@ action: variableDeclaration
       | if
       | forLoop
       | whileLoop
-      | function
+      | functionDeclaration
+      | functionInvocation DOT NL
       | print
       | errorStatement
+      | returnStatement
+      | continueStatement
+      | breakStatement
       | COMMENT
       ;
 
@@ -50,6 +54,7 @@ expr: boolExpr
     | stringExpr       
     | nullExpr      
     | inputExpr
+    | functionInvocation
     | varExpr    
     ;
 
@@ -77,9 +82,11 @@ floatExpr: numericExpr #Float ;
 boolExpr: BOOL                                              #Bool
         | NOT boolExpr                                      #BoolNot
         | LP boolExpr RP                                    #BoolBrackets
+        | boolExpr AND boolExpr                             #BoolAnd
+        | boolExpr OR boolExpr                              #BoolOr
+        | boolExpr op=(EQ|NEQ) boolExpr                     #BoolEqual
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
         | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
-        | boolExpr op=(AND|OR|EQ|NEQ) boolExpr              #BoolLogic
         | varExpr                                           #BoolVar
         ;
 
@@ -88,14 +95,14 @@ nullExpr: NULL #Null ;
 errorStatement: ERROR printExpr DOT NL;
 
 funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
-function: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam (COMMA funcParam)* RP COLON funcBlock ;
-funcBlock: INDENT (action|returnStatement)+ DEDENT ;
+functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam? (COMMA funcParam)* RP COLON actionBlock ;
+functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP ;
 
-returnStatement: RETURN expr DOT NL;
+returnStatement: RETURN expr? DOT NL ;
 
 whileLoop: WHILE boolExpr COLON loopBlock ;
 forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;
-loopBlock: INDENT (action|continueStatement|breakStatement)+ DEDENT ;
+loopBlock: actionBlock ;
 
 breakStatement: BREAK DOT NL;
 continueStatement: CONTINUE DOT NL;
@@ -107,8 +114,9 @@ variableDefinition: NAME IS expr DOT NL;
 if: ifBlock ifElseBlock* elseBlock?;
 
 ifBlock: IF boolExpr COLON actionBlock ;
-ifElseBlock: ELSE IF boolExpr COLON actionBlock ;
+ifElseBlock: ELSE_IF boolExpr COLON actionBlock ;
 elseBlock: ELSE COLON actionBlock ;
+
 actionBlock: INDENT action+ DEDENT ;
 
 inputExpr: INPUT printExpr ;
@@ -131,15 +139,14 @@ FROM: 'ex' ;
 TO: 'ad' ;
 BREAK: 'exire' ;
 CONTINUE: 'perge' ;
+ELSE_IF: 'aliter si';
 IF: 'si' ;
 ELSE: 'aliter' ;
 INPUT: 'rogare' ;
 PRINT: 'scribere' ;
 
-PLUS: 'positivum' 
-    | '+' ;
-MINUS: 'negans' 
-     | '-' ;
+PLUS: 'positivum' ;
+MINUS: 'negans' ;
 
 INT: (PLUS|MINUS)? [0-9]+ ;
 FLOAT: (PLUS|MINUS)? [0-9]+ ',' [0-9]+ ;
@@ -184,9 +191,9 @@ RP: ')' ;
 
 NAME: [a-z_]+[a-zA-Z0-9_]* ;
 
-COMMENT: '//' .*? NL -> channel(HIDDEN);
+COMMENT: '\t'* '//' .*? NL -> channel(HIDDEN);
 
-NL: ('\r'? '\n' '\t'*);
+NL: ('\r'? '\n') '\t'*;
 WS: [ ]+ -> skip;
 // WS: [ ]+ -> channel(HIDDEN) ;
 // NL: ('\r'? '\n');

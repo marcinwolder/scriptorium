@@ -1,0 +1,9 @@
+fractio munus test():
+	reddere 1,9.
+
+//numerus munus sum(numerus a, numerus b):
+numerus munus sum(fractio a, fractio b):
+	reddere a adde b.
+
+fractio x esto sum(10,5 et 5,5).
+scribere x.

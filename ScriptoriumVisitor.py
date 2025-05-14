@@ -3,8 +3,20 @@ from typing import List
 
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
-from var import Var
+from var import FuncVar, ParamVar, Var
 
+def cast_to_type(value, type_id):
+    if type_id == ScriptoriumParser.INT_TYPE:
+        return int(float(trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value))
+    elif type_id == ScriptoriumParser.FLOAT_TYPE:
+        return float(trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value)
+    elif type_id == ScriptoriumParser.STRING_TYPE:
+        return str(value)
+    elif type_id == ScriptoriumParser.BOOL_TYPE:
+        return bool(value)
+    elif type_id == ScriptoriumParser.NULL:
+        return None
+    
 class Visitor(ScriptoriumVisitor):
     var_map = {}
     recursion_level = 0
@@ -137,14 +149,20 @@ class Visitor(ScriptoriumVisitor):
         elif ctx.op.type == ScriptoriumParser.GE:
             return primary >= secondary
 
-    def visitBoolLogic(self, ctx):
+    def visitBoolAnd(self, ctx):
         primary:bool = self.visit(ctx.boolExpr(0))
         secondary:bool = self.visit(ctx.boolExpr(1))
-        if ctx.op.type == ScriptoriumParser.AND:
-            return primary and secondary
-        elif ctx.op.type == ScriptoriumParser.OR:
-            return primary or secondary
-        elif ctx.op.type == ScriptoriumParser.EQ:
+        return primary and secondary
+
+    def visitBoolOr(self, ctx):
+        primary:bool = self.visit(ctx.boolExpr(0))
+        secondary:bool = self.visit(ctx.boolExpr(1))
+        return primary or secondary
+
+    def visitBoolEqual(self, ctx):
+        primary:bool = self.visit(ctx.boolExpr(0))
+        secondary:bool = self.visit(ctx.boolExpr(1))
+        if ctx.op.type == ScriptoriumParser.EQ:
             return primary == secondary
         elif ctx.op.type == ScriptoriumParser.NEQ:
             return primary != secondary
@@ -154,35 +172,23 @@ class Visitor(ScriptoriumVisitor):
         return not primary
 
     # VAR
-    
+
     def visitVariableDefinition(self, ctx):
-        def changeOrAppend(list: List[any], index: int, value: any):
-            try: var.value[self.recursion_level] = value
-            except: var.value.append(value)
-
-        parentCtx = ctx.parentCtx.parentCtx
-        parentCtx = parentCtx if type(parentCtx) != ScriptoriumParser.ActionContext else parentCtx.parentCtx
-
-        var: Var = Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level, True)
-        # var: Var = self.var_map[parentCtx][ctx.NAME().getText()]
-
+        (var, parent_ctx) = Var.nearest_scope_variable(ctx, self.var_map, return_parent_ctx=True)
+        recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
         value = self.visit(ctx.expr())
         try:
-            if var.typeId == ScriptoriumParser.INT_TYPE:
-                value = trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value
-                changeOrAppend(var.value, self.recursion_level, int(float(value)))
-            elif var.typeId == ScriptoriumParser.FLOAT_TYPE:
-                value = trans if type(value) == str and (trans:=str(value).replace(',', '.')) else value
-                changeOrAppend(var.value, self.recursion_level, float(value))
-            elif var.typeId == ScriptoriumParser.STRING_TYPE:
-                changeOrAppend(var.value, self.recursion_level, str(value))
-            elif var.typeId == ScriptoriumParser.BOOL_TYPE:
-                changeOrAppend(var.value, self.recursion_level, bool(value))
-        except:
-            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error")
+            casted_value = cast_to_type(value, var.type_id)
+            var.change_or_append_value(recursion_level, casted_value)
+        except Exception as e:
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
 
     def visitVarExpr(self, ctx):
-        return Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level)
+        (var, parent_ctx) = Var.nearest_scope_variable(ctx, self.var_map, return_parent_ctx=True)
+        recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
+        if len(var.value) < recursion_level+1:
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" is not yet defined")
+        return var.value[recursion_level]
     
     # INPUT
 
@@ -191,15 +197,92 @@ class Visitor(ScriptoriumVisitor):
     
     # FUNCTIONS
 
-    def visitFuncBlock(self, ctx):
+    def visitFunctionInvocation(self, ctx):
+        function_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map)
+        parameters = self.var_map[function_var.function_ctx].values() if function_var.function_ctx in self.var_map.keys() else []
+        parameters = [var for var in parameters if type(var) == ParamVar]
+        arguments = ctx.expr()
+        if len(parameters) != len(arguments):
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - wrong number of arguments - got: {len(arguments)}, expected: {len(parameters)}")
+        for param, expr in zip(parameters, ctx.expr()):
+            try:
+                casted_value = cast_to_type(expr.getText(), param.type_id)
+                param.change_or_append_value(self.recursion_level, casted_value)
+            except Exception as e:
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
+        try:
+            self.visit(function_var.function_ctx.actionBlock())
+        except Exception as e:
+            if e.args[0] == 'return':
+                return cast_to_type(e.args[1], function_var.return_type)
+            raise e
+
+    def visitFunctionDeclaration(self, ctx):
         ...
+
+    def visitReturnStatement(self, ctx):
+        result = None
+        if (node:=ctx.expr()) is not None:
+            result = self.visit(node)
+        raise Exception("return", result)
+
+    # IFS
+    
+    def visitIf(self, ctx):
+        if self.visit(ctx.ifBlock().boolExpr()):
+            return self.visit(ctx.ifBlock().actionBlock())
+
+        for elseif_ctx in ctx.ifElseBlock():
+            if self.visit(elseif_ctx.boolExpr()):
+                return self.visit(elseif_ctx.actionBlock())
+
+        if ctx.elseBlock():
+            return self.visit(ctx.elseBlock().actionBlock())
 
     # LOOPS
 
+    def visitBreakStatement(self, ctx):
+        raise Exception("break")
+    
+    def visitContinueStatement(self, ctx):
+        raise Exception("continue")
+
     def visitLoopBlock(self, ctx):
-        ...
+        for action in ctx.actionBlock().children:
+            try:
+                self.visit(action)
+            except Exception as e:
+                if e.args[0] == 'continue':
+                    return
+                else:
+                    raise e
 
-    # IFS
+    # FOR LOOP
 
-    def visitActionBlock(self, ctx):
-        ...
+    def visitForLoop(self, ctx):
+        start = int(ctx.from_.text)
+        end = int(ctx.to.text)
+
+        var: Var = Var.nearest_scope_variable(ctx, self.var_map)
+
+        for i in range(start, end+1):
+            var.change_or_append_value(self.recursion_level, i)
+            try:
+                self.visit(ctx.loopBlock())
+            except Exception as e:
+                if e.args[0] == 'break':
+                    return
+                else: 
+                    raise e
+
+    # WHILE LOOP
+
+    def visitWhileLoop(self, ctx):
+        while(self.visit(ctx.boolExpr())):
+            try:
+                self.visit(ctx.loopBlock())
+            except Exception as e:
+                if e.args[0] == 'break':
+                    return
+                else: 
+                    raise e
