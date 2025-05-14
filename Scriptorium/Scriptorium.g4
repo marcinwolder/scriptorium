@@ -97,7 +97,7 @@ funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
 functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam? (COMMA funcParam)* RP COLON actionBlock ;
 functionInvocation: NAME LP expr? (COMMA expr)* RP DOT NL ;
 
-returnStatement: RETURN expr DOT NL ;
+returnStatement: RETURN expr? DOT NL ;
 
 whileLoop: WHILE boolExpr COLON loopBlock ;
 forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;

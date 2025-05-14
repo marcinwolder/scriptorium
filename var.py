@@ -4,27 +4,40 @@ from Scriptorium.ScriptoriumParser import ScriptoriumParser
 
 class Var:
     @staticmethod
-    def change_or_append_value(var, recursion_level, value):
-        try: var.value[recursion_level] = value
-        except: var.value.append(value)
+    def nearest_recursion_level(ctx, var_map):
+        recursion_level = 0
+        parent_ctx = ctx
+        while parent_ctx is not None:
+            if type(parent_ctx) == ScriptoriumParser.FunctionDeclarationContext:
+                outer_ctx = Var.nearest_scope(parent_ctx.parentCtx)
+                func_var: FuncVar = var_map[outer_ctx][parent_ctx.NAME().getText()]
+                recursion_level = func_var.recursion_level
+                break
+            parent_ctx = parent_ctx.parentCtx
+        return recursion_level
+    
+    def change_or_append_value(self, recursion_level, value):
+        try: self.value[recursion_level] = value
+        except: 
+            while recursion_level+1 > len(self.value):
+                self.value.append(None)
+            self.value[recursion_level] = value
 
     @staticmethod
-    def nearest_scope_variable(ctx, var_map, recursion_level, insert_mode=False):
+    def nearest_scope_variable(ctx, var_map, return_parent_ctx=False):
         parent_ctx = ctx
-        while (parent_ctx := parent_ctx.parentCtx) is not None:
+        while parent_ctx is not None:
             if parent_ctx in var_map.keys() and \
                 ctx.NAME().getText() in var_map[parent_ctx].keys():
-                if insert_mode: return var_map[parent_ctx][ctx.NAME().getText()]
-                if type(var_map[parent_ctx][ctx.NAME().getText()]) == FuncVar:
-                    return var_map[parent_ctx][ctx.NAME().getText()]
-                if len(var_map[parent_ctx][ctx.NAME().getText()].value) < recursion_level+1:
-                    raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" is not yet defined")
-                return var_map[parent_ctx][ctx.NAME().getText()].value[recursion_level]
+                if return_parent_ctx: return (var_map[parent_ctx][ctx.NAME().getText()], parent_ctx)
+                return var_map[parent_ctx][ctx.NAME().getText()]
+            parent_ctx = parent_ctx.parentCtx
         raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{ctx.NAME().getText()}\"")
-
+    
     @staticmethod
     def nearest_scope(ctx):
         parent_ctx = ctx
+        
         while parent_ctx.parentCtx is not None:
             if type(parent_ctx) in [
                 ScriptoriumParser.IfBlockContext, 
@@ -47,7 +60,7 @@ class Var:
         self.value = []
 
     def __str__(self):
-        return f"<typeId={self.type_id}, value={self.value}>"
+        return f"<Var: typeId={self.type_id}, value={self.value}>"
     
     def __repr__(self):
         return self.__str__()
@@ -57,6 +70,11 @@ class FuncVar(Var):
         super().__init__(type_id)
         self.return_type = return_type
         self.function_ctx = function_ctx
+        self.recursion_level = 0
     
     def __str__(self):
-        return f"<typeId={self.type_id}, value={self.value}, returnType={self.return_type}>"
+        return f"<FuncVar: typeId={self.type_id}, value={self.value}, returnType={self.return_type}>"
+    
+class ParamVar(Var):
+    def __str__(self):
+        return f"<ParamVar: typeId={self.type_id}, value={self.value}>"

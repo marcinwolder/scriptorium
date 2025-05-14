@@ -26,7 +26,8 @@ def main():
         parser.addParseListener(VariableListener(var_map))
         tree = parser.start()
 
-        # print(2, var_map)
+        # print(2)
+        # print(var_map)
 
         visitor = Visitor(var_map)
         visitor.visit(tree)

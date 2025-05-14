@@ -1,7 +1,7 @@
 from Scriptorium.ScriptoriumListener import ScriptoriumListener
 from Scriptorium.ScriptoriumLexer import ScriptoriumLexer
 
-from var import FuncVar, Var
+from var import FuncVar, ParamVar, Var
 
 class VariableListener(ScriptoriumListener):
     var_map = {} # {parentCtx -> {var_name -> Var(type, value[])}}
@@ -28,7 +28,7 @@ class VariableListener(ScriptoriumListener):
         if varNameNode.getText() in self.var_map[scope_ctx].keys():
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
         
-        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ctx.varType.type)
+        self.var_map[scope_ctx][varNameNode.getText()] = ParamVar(type_id=ctx.varType.type)
 
     def exitFunctionDeclaration(self, ctx):
         scope_ctx = Var.nearest_scope(ctx.parentCtx)
@@ -39,3 +39,13 @@ class VariableListener(ScriptoriumListener):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
         
         self.var_map[scope_ctx][varNameNode.getText()] = FuncVar(type_id=ScriptoriumLexer.FUNCTION, return_type=ctx.varType.type, function_ctx=ctx)
+
+    def exitForLoop(self, ctx):
+        scope_ctx = Var.nearest_scope(ctx)
+        varNameNode = ctx.NAME()
+        
+        self.var_map.setdefault(scope_ctx, {})
+        if varNameNode.getText() in self.var_map[scope_ctx].keys():
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - multiple variable \"{varNameNode.getText()}\" declaration")
+        
+        self.var_map[scope_ctx][varNameNode.getText()] = Var(type_id=ScriptoriumLexer.INT_TYPE)

@@ -1,0 +1,4 @@
+repetere i ex 1 ad 10:
+	si i maior quam 1:
+		scribere x.
+	numerus x esto i adde 100.
