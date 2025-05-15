@@ -1,0 +1,9 @@
+nihil munus rec(numerus i):
+	numerus x esto i.
+	scribere i.
+	si i aequalis 5:
+		reddere.
+	rec(i adde 1).
+	scribere "END" et x.
+
+rec(0).

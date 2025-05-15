@@ -101,7 +101,7 @@ functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP ;
 returnStatement: RETURN expr? DOT NL ;
 
 whileLoop: WHILE boolExpr COLON loopBlock ;
-forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;
+forLoop: FOR NAME FROM from=numericExpr TO to=numericExpr COLON loopBlock ;
 loopBlock: actionBlock ;
 
 breakStatement: BREAK DOT NL;
