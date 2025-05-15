@@ -27,3 +27,16 @@ class Var:
     def __repr__(self):
         return self.__str__()
     
+class FuncVar(Var):
+    def __init__(self, type_id: int, return_type: int, function_ctx, declaration_position: Tuple[int, int]):
+        super().__init__(type_id, declaration_position)
+        self.return_type = return_type
+        self.function_ctx = function_ctx
+        self.recursion_level = -1
+    
+    def __str__(self):
+        return f"<FuncVar: typeId={self.type_id}, value={self.value}, returnType={self.return_type}>"
+    
+class ParamVar(Var):
+    def __str__(self):
+        return f"<ParamVar: typeId={self.type_id}, value={self.value}>"

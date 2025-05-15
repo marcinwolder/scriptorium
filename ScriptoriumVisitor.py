@@ -182,7 +182,13 @@ class Visitor(ScriptoriumVisitor):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error")
 
     def visitVarExpr(self, ctx):
-        return Var.nearestScopeVariable(ctx, self.var_map, self.recursion_level)
+        (var, parent_ctx) = Var.nearest_scope_variable(ctx, self.var_map, return_parent_ctx=True)
+        recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
+        if type(var) == ParamVar:
+            return var.value[0]
+        if len(var.value) < recursion_level+1:
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" is not yet defined")
+        return var.value[recursion_level]
     
     # INPUT
 
@@ -191,7 +197,30 @@ class Visitor(ScriptoriumVisitor):
     
     # FUNCTIONS
 
-    def visitFuncBlock(self, ctx):
+    def visitFunctionInvocation(self, ctx):
+        function_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map)
+        parameters = self.var_map[function_var.function_ctx].values() if function_var.function_ctx in self.var_map.keys() else []
+        parameters = [var for var in parameters if type(var) == ParamVar]
+        arguments = ctx.expr()
+        if len(parameters) != len(arguments):
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - wrong number of arguments - got: {len(arguments)}, expected: {len(parameters)}")
+        for param, expr in zip(parameters, ctx.expr()):
+            try:
+                casted_value = cast_to_type(self.visit(expr), param.type_id)
+                param.change_or_append_value(self.recursion_level, casted_value)
+            except Exception as e:
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
+        try:
+            function_var.recursion_level += 1
+            self.visit(function_var.function_ctx.actionBlock())
+            function_var.recursion_level -= 1
+        except Exception as e:
+            if e.args[0] == 'return':
+                function_var.recursion_level -= 1
+                return cast_to_type(e.args[1], function_var.return_type)
+            raise e
+
+    def visitFunctionDeclaration(self, ctx):
         ...
 
 
@@ -217,9 +246,8 @@ class Visitor(ScriptoriumVisitor):
     # FOR LOOP
 
     def visitForLoop(self, ctx):
-        var_name = ctx.NAME().getText()
-        start = int(ctx.from_.text)
-        end = int(ctx.to.text)
+        start = int(self.visit(ctx.from_))
+        end = int(self.visit(ctx.to))
 
         parentCtx = ctx.parentCtx
         self.var_map.setdefault(parentCtx, {})

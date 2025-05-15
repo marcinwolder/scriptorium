@@ -94,8 +94,8 @@ funcBlock: INDENT (action|returnStatement)+ DEDENT ;
 returnStatement: RETURN expr DOT NL;
 
 whileLoop: WHILE boolExpr COLON loopBlock ;
-forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;
-loopBlock: INDENT (action|continueStatement|breakStatement)+ DEDENT ;
+forLoop: FOR NAME FROM from=numericExpr TO to=numericExpr COLON loopBlock ;
+loopBlock: actionBlock ;
 
 breakStatement: BREAK DOT NL;
 continueStatement: CONTINUE DOT NL;
