@@ -75,6 +75,7 @@ numericExpr: INT                                        #NumericInt
            | numericExpr op=(ADD|SUB) numericExpr       #NumericAddSub
            | numericExpr MOD numericExpr                #NumericMod
            | varExpr                                    #NumericVar
+           | functionInvocation                         #NumericFunc
            ;
 intExpr: numericExpr #Int ;
 floatExpr: numericExpr #Float ;
@@ -88,6 +89,7 @@ boolExpr: BOOL                                              #Bool
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
         | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
         | varExpr                                           #BoolVar
+        | functionInvocation                                #BoolFunc
         ;
 
 nullExpr: NULL #Null ;
@@ -101,7 +103,7 @@ functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP ;
 returnStatement: RETURN expr? DOT NL ;
 
 whileLoop: WHILE boolExpr COLON loopBlock ;
-forLoop: FOR NAME FROM from=INT TO to=INT COLON loopBlock ;
+forLoop: FOR NAME FROM from=numericExpr TO to=numericExpr COLON loopBlock ;
 loopBlock: actionBlock ;
 
 breakStatement: BREAK DOT NL;

@@ -206,14 +206,18 @@ class Visitor(ScriptoriumVisitor):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - wrong number of arguments - got: {len(arguments)}, expected: {len(parameters)}")
         for param, expr in zip(parameters, ctx.expr()):
             try:
-                casted_value = cast_to_type(expr.getText(), param.type_id)
-                param.change_or_append_value(self.recursion_level, casted_value)
+                casted_value = cast_to_type(self.visit(expr), param.type_id)
+                recursion_level = Var.nearest_recursion_level(function_var.function_ctx, self.var_map)
+                param.change_or_append_value(recursion_level+1, casted_value)
             except Exception as e:
                 raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
         try:
+            function_var.recursion_level += 1
             self.visit(function_var.function_ctx.actionBlock())
+            function_var.recursion_level -= 1
         except Exception as e:
             if e.args[0] == 'return':
+                function_var.recursion_level -= 1
                 return cast_to_type(e.args[1], function_var.return_type)
             raise e
 
@@ -260,8 +264,8 @@ class Visitor(ScriptoriumVisitor):
     # FOR LOOP
 
     def visitForLoop(self, ctx):
-        start = int(ctx.from_.text)
-        end = int(ctx.to.text)
+        start = int(self.visit(ctx.from_))
+        end = int(self.visit(ctx.to))
 
         var: Var = Var.nearest_scope_variable(ctx, self.var_map)
 

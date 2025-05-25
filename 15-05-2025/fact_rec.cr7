@@ -1,0 +1,7 @@
+numerus munus fact(numerus x):
+	si x maior quam 0:
+		reddere fact(x minue 1) multiplica x.
+	aliter:
+		reddere 1.
+
+scribere fact(5).

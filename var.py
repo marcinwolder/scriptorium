@@ -72,7 +72,7 @@ class FuncVar(Var):
         super().__init__(type_id, declaration_position)
         self.return_type = return_type
         self.function_ctx = function_ctx
-        self.recursion_level = 0
+        self.recursion_level = -1
     
     def __str__(self):
         return f"<FuncVar: typeId={self.type_id}, value={self.value}, returnType={self.return_type}>"
