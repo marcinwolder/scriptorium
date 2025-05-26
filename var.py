@@ -24,15 +24,16 @@ class Var:
             self.value[recursion_level] = value
 
     @staticmethod
-    def nearest_scope_variable(ctx, var_map, return_parent_ctx=False):
+    def nearest_scope_variable(ctx, var_map, return_parent_ctx=False, name="", scope=0):
+        var_name = name if name != "" else ctx.NAME().getText()
         parent_ctx = ctx
         while parent_ctx is not None:
             if parent_ctx in var_map.keys() and \
-                ctx.NAME().getText() in var_map[parent_ctx].keys():
-                if return_parent_ctx: return (var_map[parent_ctx][ctx.NAME().getText()], parent_ctx)
-                return var_map[parent_ctx][ctx.NAME().getText()]
+                var_name in var_map[parent_ctx].keys():
+                if return_parent_ctx: return (var_map[parent_ctx][var_name], parent_ctx)
+                return var_map[parent_ctx][var_name]
             parent_ctx = parent_ctx.parentCtx
-        raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{ctx.NAME().getText()}\"")
+        raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{var_name}\""+(f" {scope} scope(s) ago" if scope != 0 else ""))
     
     @staticmethod
     def nearest_scope(ctx):

@@ -58,7 +58,7 @@ expr: boolExpr
     | varExpr    
     ;
 
-varExpr: NAME ;
+varExpr: PARENT* NAME ;
 
 stringExpr
     : STRING                      #String
@@ -160,6 +160,8 @@ INT_TYPE: 'numerus' ;
 FLOAT_TYPE: 'fractio' ;
 BOOL_TYPE: 'veritas' ;
 STRING_TYPE: 'sententia' ;
+
+PARENT: 'parentes' ;
 
 NULL: 'nihil' ;
 
