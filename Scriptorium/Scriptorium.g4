@@ -34,7 +34,7 @@ def nextToken(self):
 start: action* EOF;
 
 action: variableDeclaration
-      | variableDefinition
+      | parentVariableDefinition
       | if
       | forLoop
       | whileLoop
@@ -112,6 +112,7 @@ continueStatement: CONTINUE DOT NL;
 variableDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) variableDefinition
                    | varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME DOT NL;
 variableDefinition: NAME IS expr DOT NL;
+parentVariableDefinition: PARENT* variableDefinition ;
 
 if: ifBlock ifElseBlock* elseBlock?;
 

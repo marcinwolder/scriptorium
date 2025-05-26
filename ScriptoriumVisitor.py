@@ -173,8 +173,23 @@ class Visitor(ScriptoriumVisitor):
 
     # VAR
 
-    def visitVariableDefinition(self, ctx):
-        (var, parent_ctx) = Var.nearest_scope_variable(ctx, self.var_map, return_parent_ctx=True)
+    def visitParentVariableDefinition(self, ctx):
+        scope_level = len(ctx.PARENT())
+        parent_level_ctx = Var.nth_nearest_scope(ctx, scope_level)
+        self.visitVariableDefinition(ctx.variableDefinition(), scope_ctx=parent_level_ctx, scope_level=scope_level)
+        # (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
+        # recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
+        # value = self.visit(ctx.expr())
+        # print("value", value, "name", ctx.NAME().getText())
+        # try:
+        #     casted_value = cast_to_type(value, var.type_id)
+        #     var.change_or_append_value(recursion_level, casted_value)
+        # except Exception as e:
+        #     raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
+
+    def visitVariableDefinition(self, ctx, scope_ctx=None, scope_level=0):
+        # parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
+        (var, parent_ctx) = Var.nearest_scope_variable(scope_ctx if scope_ctx is not None else ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=scope_level)
         recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
         value = self.visit(ctx.expr())
         try:
@@ -184,14 +199,7 @@ class Visitor(ScriptoriumVisitor):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
 
     def visitVarExpr(self, ctx):
-        # print("parent lvl:", len(ctx.PARENT()))
-        parent_cnt = len(ctx.PARENT())
-        parent_level_ctx = ctx
-        while parent_cnt >= 0:
-            if parent_level_ctx.parentCtx is None:
-                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" was not defined {len(ctx.PARENT())} scope(s) ago")
-            parent_level_ctx = Var.nearest_scope(parent_level_ctx.parentCtx)
-            parent_cnt -= 1
+        parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
         (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
         recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
         if len(var.value) < recursion_level+1:

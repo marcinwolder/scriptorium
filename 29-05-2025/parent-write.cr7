@@ -1,0 +1,6 @@
+repetere x ex 0 ad 10:
+	numerus i esto x.
+	repetere x ex 0 ad 10:
+		numerus i esto 0.
+		parentes i esto x.
+	scribere i.
