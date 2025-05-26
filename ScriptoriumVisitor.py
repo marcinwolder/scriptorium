@@ -36,6 +36,21 @@ class Visitor(ScriptoriumVisitor):
     def visitExprInPrint(self, ctx):
         return str(self.visit(ctx.expr()))
 
+    # CAST
+
+    def visitCastedValue(self, ctx):
+        if ctx.functionInvocation():
+            value = self.visit(ctx.functionInvocation())
+        elif ctx.varExpr():
+            value = self.visit(ctx.varExpr())
+        else:
+            value = ctx.getChild(0).getText()
+        return cast_to_type(value, ctx.type_.type)
+    
+    def visitCastedAgain(self, ctx):
+        value = self.visit(ctx.castedExpr())
+        return cast_to_type(value, ctx.type_.type)
+
     # STRING
 
     def visitString(self, ctx):
@@ -177,18 +192,8 @@ class Visitor(ScriptoriumVisitor):
         scope_level = len(ctx.PARENT())
         parent_level_ctx = Var.nth_nearest_scope(ctx, scope_level)
         self.visitVariableDefinition(ctx.variableDefinition(), scope_ctx=parent_level_ctx, scope_level=scope_level)
-        # (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
-        # recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
-        # value = self.visit(ctx.expr())
-        # print("value", value, "name", ctx.NAME().getText())
-        # try:
-        #     casted_value = cast_to_type(value, var.type_id)
-        #     var.change_or_append_value(recursion_level, casted_value)
-        # except Exception as e:
-        #     raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
 
     def visitVariableDefinition(self, ctx, scope_ctx=None, scope_level=0):
-        # parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
         (var, parent_ctx) = Var.nearest_scope_variable(scope_ctx if scope_ctx is not None else ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=scope_level)
         recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
         value = self.visit(ctx.expr())

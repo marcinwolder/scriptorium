@@ -60,10 +60,16 @@ expr: boolExpr
 
 varExpr: PARENT* NAME ;
 
+castedExpr: (INT|FLOAT|STRING|BOOL|functionInvocation|varExpr) AS type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE)  #CastedValue
+          | castedExpr AS type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE)                                          #CastedAgain
+          ;
+
 stringExpr
     : STRING                      #String
     | stringExpr ADD stringExpr   #StringAdd
     | varExpr                     #StringVar
+    | castedExpr                  #StringCast
+    | functionInvocation          #StringFunc
     ;
 
 numericExpr: INT                                        #NumericInt
@@ -75,6 +81,7 @@ numericExpr: INT                                        #NumericInt
            | numericExpr op=(ADD|SUB) numericExpr       #NumericAddSub
            | numericExpr MOD numericExpr                #NumericMod
            | varExpr                                    #NumericVar
+           | castedExpr                                 #NumericCast
            | functionInvocation                         #NumericFunc
            ;
 intExpr: numericExpr #Int ;
@@ -89,6 +96,7 @@ boolExpr: BOOL                                              #Bool
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
         | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
         | varExpr                                           #BoolVar
+        | castedExpr                                        #BoolCast
         | functionInvocation                                #BoolFunc
         ;
 
@@ -130,6 +138,11 @@ printExpr: expr                                 #ExprInPrint
          | printExpr PRINT_SEPARATOR printExpr  #PrintAdd
          ;
 
+any: INT 
+   | FLOAT 
+   | STRING 
+   | BOOL ;
+
 // LEXER
 
 PRINT_SEPARATOR: 'et' ;
@@ -163,6 +176,8 @@ BOOL_TYPE: 'veritas' ;
 STRING_TYPE: 'sententia' ;
 
 PARENT: 'parentes' ;
+
+AS: 'ut' ;
 
 NULL: 'nihil' ;
 
