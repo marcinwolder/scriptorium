@@ -214,7 +214,7 @@ class Visitor(ScriptoriumVisitor):
     # INPUT
 
     def visitInputExpr(self, ctx):
-        return input(self.visit(ctx.printExpr()))
+        return input(self.visit(ctx.printExpr())+" ")
     
     # FUNCTIONS
 
