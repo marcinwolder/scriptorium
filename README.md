@@ -1,37 +1,37 @@
 # 🪶 Scriptorium
 
-Scriptorium to autorski, eksperymentalny język programowania inspirowany składnią języków imperatywnych (takich jak Python czy C), wyposażony w własny parser, leksykalizator oraz interpreter oparty na ANTLR4. Obsługuje zmienne, funkcje (z rekurencją), pętle i kontrolę przepływu. Projekt służy jako baza do nauki budowy języków programowania, analiz składniowych i semantycznych, a także jako narzędzie dydaktyczne.
+Scriptorium is an original, experimental programming language inspired by the syntax of imperative languages (such as Python or C), equipped with its own parser, lexer, and interpreter based on ANTLR4. It supports variables, functions (with recursion), loops, and flow control. The project serves as a foundation for learning about programming language construction, syntactic and semantic analysis, and as an educational tool.
 
 ---
 
-## 📦 Instalacja i konfiguracja
+## 📦 Installation and Configuration
 
-### ⚙ Wymagania systemowe
+### ⚙ System Requirements
 
 - Python **3.13**
-- System: Windows, Linux lub macOS
-- Java (wymagany przez ANTLR): min. Java 8
+- System: Windows, Linux, or macOS
+- Java (required by ANTLR): minimum Java 8
 
 ---
 
-### 📚 Instalacja zależności
+### 📚 Installing Dependencies
 
-1. **Utwórz środowisko wirtualne** (rekomendowane):
+1. **Create a virtual environment** (recommended):
 
 ```bash
 py -3.13 -m venv venv
 source venv/Scripts/activate       # Windows
-# lub
+# or
 source venv/bin/activate           # Linux/macOS
-````
+```
 
-2. **Zainstaluj wymagane moduły**:
+2. **Install required modules**:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-> 📄 Upewnij się, że plik `requirements.txt` zawiera:
+> 📄 Ensure that the `requirements.txt` file contains:
 >
 > * `antlr4-tools`
 > * `antlr4-python3-runtime`
@@ -39,16 +39,16 @@ pip install -r requirements.txt
 
 ---
 
-### 🛠️ Kompilacja gramatyki ANTLR
+### 🛠️ Compiling the ANTLR Grammar
 
-Parser i visitor są generowane z pliku gramatyki `Scriptorium.g4`. Aby zbudować projekt:
+The parser and visitor are generated from the `Scriptorium.g4` grammar file. To build the project:
 
 ```bash
 cd ./Scriptorium
 antlr4 ./Scriptorium.g4 -visitor -Dlanguage=Python3
 ```
 
-Po tej operacji w folderze powinny pojawić się pliki:
+After this operation, the following files should appear in the directory:
 
 * `ScriptoriumParser.py`
 * `ScriptoriumLexer.py`
@@ -57,15 +57,15 @@ Po tej operacji w folderze powinny pojawić się pliki:
 
 ---
 
-### 🎮 Uruchomienie programu
+### 🎮 Running the Program
 
-1. Stwórz plik źródłowy w języku Scriptorium z rozszerzeniem `.cr7`:
+1. Create a source file in the Scriptorium language with the `.cr7` extension:
 
 ```bash
 touch hello.cr7
 ```
 
-2. W katalogu głównym uruchom interpreter:
+2. In the root directory, run the interpreter:
 
 ```bash
 python main.py hello.cr7
@@ -73,7 +73,7 @@ python main.py hello.cr7
 
 ---
 
-### 🧪 Przykładowa sesja
+### 🧪 Example Session
 
 ```bash
 $ python main.py hello.cr7
@@ -82,21 +82,21 @@ CULPA: linea 1:18 - missing NL at 'numerus'
 
 ---
 
-### 🧰 Narzędzia developerskie
+### 🧰 Developer Tools
 
-Jeśli używasz edytora kodu jak VSCode, możesz skorzystać z rozszerzeń do:
+If you use a code editor like VSCode, you can take advantage of extensions for:
 
-* Obsługi składni `.g4` (ANTLR)
-* Obsługi środowisk `venv`
-* Debuggera dla Pythona
+* Support for `.g4` syntax (ANTLR)
+* Support for `venv` environments
+* Python debugger
 
 ---
 
-### 🔧 Problemy i debugowanie
+### 🔧 Troubleshooting and Debugging
 
-* Jeśli nie masz polecenia `antlr4` w terminalu, dodaj ANTLR do zmiennych środowiskowych.
-* Upewnij się, że Twoja wersja Javy jest aktualna (`java -version`).
-* Jeśli ANTLR generuje pliki do innego folderu — użyj flagi `-o .` w komendzie:
+* If the `antlr4` command is not available in the terminal, add ANTLR to the environment variables.
+* Ensure your Java version is up to date (`java -version`).
+* If ANTLR generates files to a different directory, use the `-o .` flag in the command:
 
 ```bash
 antlr4 -Dlanguage=Python3 -visitor -o . Scriptorium.g4
@@ -104,25 +104,24 @@ antlr4 -Dlanguage=Python3 -visitor -o . Scriptorium.g4
 
 ---
 
-Gotowe! Teraz możesz pisać programy w `.cr7` i uruchamiać je za pomocą własnego interpretera 🎉
+Ready! Now you can write programs in `.cr7` and run them using your own interpreter 🎉
 
+## 🧾 Syntax and Basics
 
-## 🧾 Składnia i podstawy
-
-Scriptorium to eksperymentalny język programowania inspirowany klasyczną łaciną. Używa pełnych słów jako operatorów i struktur kontrolnych. Bazuje na wcięciach (podobnie jak Python), wspiera funkcje, warunki, pętle oraz typowanie statyczne.
+Scriptorium is an experimental programming language inspired by classical Latin. It uses full words as operators and control structures. It relies on indentation (similar to Python), supports functions, conditions, loops, and static typing.
 
 ---
 
-### 📌 Zmienne
+### 📌 Variables
 
-Zmienne deklaruje się za pomocą typu (`numerus`, `fractio`, `veritas`, `sententia`) i słowa kluczowego `esto`:
+Variables are declared using a type (`numerus`, `fractio`, `veritas`, `sententia`) and the keyword `esto`:
 
 ```cr7
 numerus a esto 10.
 sententia powitanie esto "salve".
-````
+```
 
-Deklaracja bez przypisania:
+Declaration without assignment:
 
 ```cr7
 fractio zmienna.
@@ -130,26 +129,26 @@ fractio zmienna.
 
 ---
 
-### 📌 Wypisywanie
+### 📌 Output
 
-Służy do tego słowo kluczowe `scribere`. Można łączyć wiele wartości za pomocą `et`:
+The keyword `scribere` is used for output. Multiple values can be combined using `et`:
 
 ```cr7
-scribere "Wynik: " et a et ".".
+scribere "Result: " et a et ".".
 ```
 
 ---
 
-### 📌 Funkcje
+### 📌 Functions
 
-Funkcje definiujemy przez `munus`, podając typ zwracany, nazwę, parametry i blok działań:
+Functions are defined using `munus`, specifying the return type, name, parameters, and action block:
 
 ```cr7
 numerus munus suma(numerus a, numerus b):
     reddere a adde b.
 ```
 
-Wywołanie funkcji:
+Function call:
 
 ```cr7
 numerus wynik esto suma(5, 10).
@@ -157,31 +156,31 @@ numerus wynik esto suma(5, 10).
 
 ---
 
-### 📌 Warunki
+### 📌 Conditions
 
-Instrukcja warunkowa `si`, opcjonalnie `aliter si`, zakończona `aliter`.
+The conditional statement `si`, optionally `aliter si`, ended with `aliter`:
 
 ```cr7
 si a aequalis 10:
-    scribere "Dziesięć.".
+    scribere "Ten.".
 aliter si a minor quam 10:
-    scribere "Mniej niż dziesięć.".
+    scribere "Less than ten.".
 aliter:
-    scribere "Więcej niż dziesięć.".
+    scribere "More than ten.".
 ```
 
 ---
 
-### 📌 Pętle
+### 📌 Loops
 
-#### 🔁 `repetere` — pętla `for`
+#### 🔁 `repetere` — `for` loop
 
 ```cr7
 repetere i ex 1 ad 5:
     scribere i.
 ```
 
-#### 🔁 `dum` — pętla `while`
+#### 🔁 `dum` — `while` loop
 
 ```cr7
 dum a minor quam 100:
@@ -190,142 +189,141 @@ dum a minor quam 100:
 
 ---
 
-### 📌 Operatory
+### 📌 Operators
 
-Operatory w Scriptorium to pełne słowa:
+Operators in Scriptorium are full words:
 
-#### Arytmetyczne
+#### Arithmetic
 
-| Symboliczny | Scriptorium  |
-| ----------- | ------------ |
-| `+`         | `adde`       |
-| `-`         | `minue`      |
-| `*`         | `multiplica` |
-| `/`         | `divide`     |
-| `//`        | `totum`      |
-| `%`         | `residuum`   |
-| `^`         | `potentia`   |
+| Symbolic | Scriptorium  |
+|----------|--------------|
+| `+`      | `adde`       |
+| `-`      | `minue`      |
+| `*`      | `multiplica` |
+| `/`      | `divide`     |
+| `//`     | `totum`      |
+| `%`      | `residuum`   |
+| `^`      | `potentia`   |
 
-#### Porównania
+#### Comparison
 
-| Symboliczny | Scriptorium      |
-| ----------- | ---------------- |
-| `==`        | `aequalis`       |
-| `!=`        | `inaequale`      |
-| `<`         | `minor quam`     |
-| `<=`        | `minor aequalis` |
-| `>`         | `maior quam`     |
-| `>=`        | `maior aequalis` |
+| Symbolic | Scriptorium      |
+|----------|------------------|
+| `==`     | `aequalis`       |
+| `!=`     | `inaequale`      |
+| `<`      | `minor quam`     |
+| `<=`     | `minor aequalis` |
+| `>`      | `maior quam`     |
+| `>=`     | `maior aequalis` |
 
-#### Logiczne
+#### Logical
 
-| Symboliczny | Scriptorium |    |       |
-| ----------- | ----------- | -- | ----- |
-| `&&`        | `etiam`     |    |       |
-| \`          |             | \` | `aut` |
-| `!`         | `non`       |    |       |
+| Symbolic | Scriptorium |    |       |
+|----------|-------------|----|-------|
+| `&&`     | `etiam`     |    |       |
+| `||`     | `aut`       |    |       |
+| `!`      | `non`       |    |       |
 
 ---
 
-### 📌 Specjalne instrukcje
+### 📌 Special Instructions
 
-* `culpa`: wypisanie błędu
+* `culpa`: outputs an error
 
 ```cr7
-culpa "To nie powinno się wydarzyć!".
+culpa "This should not happen!".
 ```
 
-* `reddere`: zwraca wartość z funkcji
-* `exire`: przerywa pętlę (`break`)
-* `perge`: kontynuuje kolejną iterację (`continue`)
-* `rogare`: pobiera dane od użytkownika (input)
+* `reddere`: returns a value from a function
+* `exire`: breaks a loop (`break`)
+* `perge`: continues to the next iteration (`continue`)
+* `rogare`: retrieves user input
 
 ---
 
-### 📌 Komentarze
+### 📌 Comments
 
-Komentarze jednoliniowe rozpoczynają się od `//`:
+Single-line comments start with `//`:
 
 ```cr7
-// To jest komentarz
+// This is a comment
 numerus x esto 10.
 ```
 
+## 🧩 Data Structures
 
-## 🧩 Struktury danych
-
-Scriptorium wspiera **statycznie typowane** zmienne czterech głównych typów danych oraz wartość pustą `nihil`.
-
----
-
-### 📦 Typy danych
-
-| Typ           | Słowo kluczowe | Przykład              | Opis                        |
-|---------------|----------------|------------------------|-----------------------------|
-| Liczba całkowita   | `numerus`      | `numerus a esto 10.`     | Odpowiada typowi `int`     |
-| Liczba zmiennoprzecinkowa | `fractio`     | `fractio x esto 3,14.`   | Używa przecinka zamiast kropki |
-| Łańcuch znaków | `sententia`   | `sententia s esto "hej".`| Typ tekstowy (`string`)     |
-| Wartość logiczna | `veritas`     | `veritas v esto verum.`  | `verum` lub `falsum`        |
-| Wartość pusta | `nihil`        | `nihil munus brak(): ...`| Odpowiednik `None` / `void` |
+Scriptorium supports **statically typed** variables of four main data types and the null value `nihil`.
 
 ---
 
-### 🧮 Przypisanie wartości
+### 📦 Data Types
 
-Zmienne przypisuje się za pomocą `esto`:
+| Type           | Keyword       | Example                  | Description                        |
+|----------------|---------------|--------------------------|----------------------------|
+| Integer        | `numerus`     | `numerus a esto 10.`     | Corresponds to `int`       |
+| Floating-point | `fractio`     | `fractio x esto 3,14.`   | Uses a comma instead of a dot |
+| String         | `sententia`   | `sententia s esto "hej".`| Text type (`string`)       |
+| Boolean        | `veritas`     | `veritas v esto verum.`  | `verum` or `falsum`        |
+| Null value     | `nihil`       | `nihil munus brak(): ...`| Equivalent to `None` / `void` |
+
+---
+
+### 🧮 Value Assignment
+
+Variables are assigned using `esto`:
 
 ```cr7
 numerus wiek esto 25.
 fractio pi esto 3,14.
 sententia powitanie esto "salve!".
 veritas aktywne esto verum.
-````
+```
 
 ---
 
-### 🔄 Dynamiczna wartość, statyczny typ
+### 🔄 Dynamic Value, Static Type
 
-Typ zmiennej jest **ustalany w momencie deklaracji** i nie może zostać zmieniony. Przykład niepoprawny:
+The variable type is **determined at declaration** and cannot be changed. Incorrect example:
 
 ```cr7
 numerus x esto 5.
-x esto "pięć".  // ❌ Błąd – typ `sententia` niezgodny z `numerus`
+x esto "five".  // ❌ Error – type `sententia` incompatible with `numerus`
 ```
 
 ---
 
-### 📥 Wczytywanie danych
+### 📥 Input Handling
 
-Można używać `rogare` do wczytywania danych użytkownika. Wynik to zawsze `sententia`.
+The `rogare` keyword can be used to read user input. The result is always a `sententia`.
 
 ```cr7
-sententia imie esto rogare "Podaj imię: ".
+sententia imie esto rogare "Enter name: ".
 ```
 
 ---
 
-### 🔀 Konwersje (jawne)
+### 🔀 Conversions (Explicit)
 
-Obecnie język nie obsługuje rzutowania typów bezpośrednio w kodzie – wszystkie konwersje należy przeprowadzać jawnie po stronie interpretera.
+Currently, the language does not support direct type casting in the code – all conversions must be handled explicitly by the interpreter.
 
 ---
 
-### 🔐 Zakres zmiennych
+### 🔐 Variable Scope
 
-Zmienne są widoczne tylko w **najbliższym bloku** (`if`, `for`, `munus` itd.). Dostęp do zmiennych z wyższych poziomów odbywa się zgodnie z zasadą zagnieżdżonego zasięgu.
+Variables are visible only in the **nearest block** (`if`, `for`, `munus`, etc.). Access to variables from higher levels follows the nested scope principle.
 
 ```cr7
 numerus globalna esto 5.
 
 munus test():
-    scribere globalna.  // ✔ dostęp do zmiennej wyżej
+    scribere globalna.  // ✔ Access to variable from higher scope
 ```
 
 ---
 
-### 🧠 Zmienna funkcyjna (`munus` jako obiekt)
+### 🧠 Function Variable (`munus` as an object)
 
-Funkcje w Scriptorium są reprezentowane jako zmienne typu `FuncVar` (wewnętrznie). Można je wywoływać tak samo jak zmienne:
+Functions	In	Scriptorium	are	represented as variables of type `FuncVar` (internally). They can be called the same way as variables:
 
 ```cr7
 numerus munus dodaj(numerus a, numerus b):
@@ -336,70 +334,67 @@ numerus wynik esto dodaj(1, 2).
 
 ---
 
+## 🛑 Error Handling and Messages
 
-## 🛑 Obsługa błędów i komunikaty
-
-Scriptorium został zaprojektowany tak, aby maksymalnie ułatwić wykrywanie i diagnozowanie błędów składniowych oraz semantycznych. Błędy są zgłaszane w sposób jasny i precyzyjny, ze wskazaniem miejsca problemu w kodzie.
+Scriptorium is designed to make detecting and diagnosing syntactic and semantic errors as easy as possible. Errors are reported clearly and precisely, indicating the location of the issue in the code.
 
 ---
 
-### ⚠️ Rodzaje błędów
+### ⚠️ Types of Errors
 
-1. **Błędy składniowe (SyntaxError)**  
-   Wykrywane podczas analizy kodu przez parser.  
-   Przykłady komunikatów:
+1. **Syntax Errors (SyntaxError)**  
+   Detected during code analysis by the parser.  
+   Example messages:
    - `CULPA: linea 3:5 - syntax error at 'esto'`  
-     (np. niepoprawne użycie słowa kluczowego lub operatora)
+     (e.g., incorrect use of a keyword or operator)
    - `CULPA: linea 5:10 - missing (")`  
-     (niezamknięty łańcuch znaków)
+     (unclosed string)
    - `CULPA: linea 7:1 - incomplete or incorrect sentence`  
-     (np. brakujący element w konstrukcji językowej)
+     (e.g., missing element in a language construct)
 
-2. **Błędy semantyczne**  
-   Wykrywane podczas analizy zmiennych i funkcji w czasie parsowania (z użyciem `VariableListener`).  
-   Przykłady:
+2. **Semantic Errors**  
+   Detected during variable and function analysis while parsing (using `VariableListener`).  
+   Examples:
    - `CULPA: linea 4:0 - multiple variable or function "x" declaration (delcared in 2:0)`  
-     (powtórna deklaracja zmiennej lub funkcji o tej samej nazwie w tym samym zakresie)
+     (duplicate declaration of a variable or function in the same scope)
    - `CULPA: linea 8:3 - no variable named "y"`  
-     (użycie niezadeklarowanej zmiennej)
+     (use of an undeclared variable)
 
-3. **Błędy wykonania (runtime errors)**  
-   Aktualnie język nie wspiera zaawansowanych mechanizmów wyjątków, ale błędy takie jak dzielenie przez zero lub inne nieprawidłowe operacje powinny być obsłużone przez interpreter (w ramach rozszerzeń).
+3. **Runtime Errors**  
+   Currently, the language does not support advanced exception mechanisms, but errors such as division by zero or other invalid operations should be handled by the interpreter (as part of extensions).
 
 ---
 
-### 💬 Format komunikatu błędu
+### 💬 Error Message Format
 
 ```
+CULPA: linea <line>:<column> - <error description>
+```
 
-CULPA: linea <linia>:<kolumna> - \<opis błędu>
-
-````
-
-- `CULPA` — prefiks oznaczający błąd (łac. "wina").
-- `linea <linia>:<kolumna>` — miejsce wystąpienia błędu w pliku źródłowym.
-- `<opis błędu>` — krótki opis problemu.
+- `CULPA` — prefix indicating an error (Latin for "fault").
+- `linea <line>:<column>` — location of the error in the source file.
+- `<error description>` — brief description of the issue.
 
 ---
 
-### ⚙️ Mechanizm wykrywania błędów
+### ⚙️ Error Detection Mechanism
 
-- Parser i lexer korzystają ze specjalnego `ErrorListener` (rozszerzenie `antlr4`), który przechwytuje i formatuje błędy składniowe.
-- Podczas parsowania słuchacz `VariableListener` buduje mapę zmiennych i funkcji, zgłaszając konflikty deklaracji lub odwołań do nieistniejących nazw.
-- W `main.py` wszystkie wyjątki są łapane i wyświetlane, co umożliwia łatwe debugowanie.
+- The parser and lexer use a custom `ErrorListener` (an extension of `antlr4`), which captures and formats syntax errors.
+- During parsing, the `VariableListener` builds a map of variables and functions, reporting declaration conflicts or references to nonexistent names.
+- In `main.py`, all exceptions are caught and displayed, making debugging straightforward.
 
 ---
 
-### 📝 Przykład błędu
+### 📝 Error Example
 
-Kod źródłowy:
+Source code:
 
 ```cr7
 numerus x esto 5.
-numerus x esto 10.  // próba podwójnej deklaracji
-````
+numerus x esto 10.  // attempt at double declaration
+```
 
-Wynik działania interpretera:
+Interpreter output:
 
 ```
 CULPA: linea 2:0 - multiple variable or function "x" declaration (delcared in 1:0)
@@ -407,61 +402,60 @@ CULPA: linea 2:0 - multiple variable or function "x" declaration (delcared in 1:
 
 ---
 
-### 🔧 Wskazówki
+### 🔧 Tips
 
-* Dbaj o unikalność nazw zmiennych i funkcji w ramach tego samego zakresu (funkcji, pętli, bloku `if`).
-* Zwracaj uwagę na poprawne zakończenie instrukcji kropką `.`.
-* Sprawdzaj dokładnie format i zamknięcie łańcuchów znaków.
-* W przypadku błędów składniowych zwróć uwagę na podany przez parser token, który sprawia problem.
-
----
-
-## 🏗️ Architektura projektu
-
-Projekt interpreter języka Scriptorium jest podzielony na kilka kluczowych komponentów, które współpracują, by zrealizować proces interpretacji kodu źródłowego w języku Scriptorium (z rozszerzeniem `.cr7`).
+* Ensure the uniqueness of variable and function names within the same scope (function, loop, `if` block).
+* Pay attention to properly ending statements with a period `.`.
+* Carefully check the format and closure of strings.
+* For syntax errors, note the token indicated by the parser that is causing the issue.
 
 ---
 
-### 🧩 Główne moduły
+## 🏗️ Project Architecture
 
-| Komponent              | Opis                                                                                   |
-|-----------------------|----------------------------------------------------------------------------------------|
-| **`Scriptorium.g4`**   | Plik z gramatyką języka — zawiera reguły parsera i lexer, definiuje składnię i tokeny. |
-| **`main.py`**          | Punkt startowy interpretera. Ładuje plik `.cr7`, inicjuje parser i odwiedzacza (visitor).|
-| **`visitor.py`**       | Implementacja odwiedzacza (`Visitor`), który przechodzi po drzewie składniowym i interpretuje kod. |
-| **`var.py`**           | Definicje klas zmiennych (`Var`, `FuncVar`, `ParamVar`) oraz mechanizmy zarządzania zakresami i wartościami. |
-| **`VariableListener.py`** | Słuchacz (listener) budujący mapę zmiennych i funkcji oraz wykrywający błędy deklaracji. |
-| **`requirements.txt`** | Lista wymaganych bibliotek i narzędzi (np. `antlr4-python3-runtime`, `antlr4-tools`, `antlr-denter`). |
+The Scriptorium language interpreter project is divided into several key components that work together to interpret source code in the Scriptorium language (with the `.cr7` extension).
 
 ---
 
-### 🔄 Przepływ działania interpretera
+### 🧩 Main Modules
 
-1. **Wczytanie kodu**  
-   Interpreter wczytuje plik `.cr7` z kodem źródłowym.
-
-2. **Tokenizacja i parsowanie**  
-   - Lexer generuje tokeny na podstawie reguł z `Scriptorium.g4`.  
-   - Parser buduje drzewo składniowe (AST) zgodnie z gramatyką.
-
-3. **Analiza zmiennych i funkcji (VariableListener)**  
-   - Listener przechodzi po drzewie i tworzy mapę zmiennych i funkcji wraz z ich zakresami.  
-   - Sprawdza poprawność deklaracji i zgłasza błędy.
-
-4. **Interpretacja kodu (Visitor)**  
-   - Odwiedzacz przechodzi po AST, wykonując instrukcje, obliczając wyrażenia, wywołując funkcje itd.  
-   - Zarządza stanem programu, np. wartościami zmiennych, poziomem rekurencji funkcji.
-
-5. **Wyświetlanie wyników i obsługa błędów**  
-   - Interpreter wypisuje wyniki komend `scribere` (print).  
-   - Błędy są wychwytywane i zgłaszane w czytelnej formie.
+| Component              | Description                                                                                   |
+|-----------------------|-----------------------------------------------------------------------------------------------|
+| **`Scriptorium.g4`**   | Grammar file — contains parser and lexer rules, defines syntax and tokens.                     |
+| **`main.py`**          | Entry point of the interpreter. Loads the `.cr7` file, initializes the parser and visitor.     |
+| **`visitor.py`**       | Implementation of the visitor, which traverses the syntax tree and interprets the code.         |
+| **`var.py`**           | Definitions of variable classes (`Var`, `FuncVar`, `ParamVar`) and mechanisms for scope and value management. |
+| **`VariableListener.py`** | Listener that builds a map of variables and functions and detects declaration errors.           |
+| **`requirements.txt`** | List of required libraries and tools (e.g., `antlr4-python3-runtime`, `antlr4-tools`, `antlr-denter`). |
 
 ---
 
-### 📁 Struktura katalogów (przykład)
+### 🔄 Interpreter Workflow
+
+1. **Code Loading**  
+   The interpreter loads the `.cr7` source code file.
+
+2. **Tokenization and Parsing**  
+   - The lexer generates tokens based on the rules in `Scriptorium.g4`.  
+   - The parser builds an abstract syntax tree (AST) according to the grammar.
+
+3. **Variable and Function Analysis (VariableListener)**  
+   - The listener traverses the tree and creates a map of variables and functions with their scopes.  
+   - It checks the correctness of declarations and reports errors.
+
+4. **Code Interpretation (Visitor)**  
+   - The visitor traverses the AST, executing statements, evaluating expressions, calling functions, etc.  
+   - It manages the program state, e.g., variable values, function recursion levels.
+
+5. **Displaying Results and Error Handling**  
+   - The interpreter outputs results of `scribere` (print) commands.  
+   - Errors are caught and reported in a readable form.
+
+---
+
+### 📁 Directory Structure (Example)
 
 ```
-
 /Scriptorium
 │
 ├── main.py
@@ -471,113 +465,111 @@ Projekt interpreter języka Scriptorium jest podzielony na kilka kluczowych komp
 ├── Scriptorium.g4
 ├── requirements.txt
 └── README.md
-
 ```
 
 ---
 
-### 🛠️ Narzędzia i biblioteki
+### 🛠️ Tools and Libraries
 
-- **ANTLR4** — generowanie lexerów i parserów z pliku `.g4`.
-- **antlr4-python3-runtime** — runtime do obsługi parsera w Pythonie.
-- **antlr-denter** — rozszerzenie lexer'a do obsługi wcięć (indent/dedent) w stylu Pythona.
-- **Python 3.13** — środowisko uruchomieniowe.
+- **ANTLR4** — generates lexers and parsers from the `.g4` file.
+- **antlr4-python3-runtime** — runtime for parser support in Python.
+- **antlr-denter** — lexer extension for handling indentation (indent/dedent) in the style of Python.
+- **Python 3.13** — runtime environment.
 
 ---
 
-## FAQ — Najczęściej zadawane pytania
+## FAQ — Frequently Asked Questions
 
-### 1. Jakiego rozszerzenia plików używa język Scriptorium?  
-Pliki źródłowe języka Scriptorium mają rozszerzenie `.cr7`.
+### 1. What file extension does the Scriptorium language use?  
+Source files for the Scriptorium language have the `.cr7` extension.
 
-### 2. Jak uruchomić program napisany w Scriptorium?  
-Po stworzeniu pliku `.cr7`, uruchom interpreter poleceniem:  
+### 2. How do I run a program written in Scriptorium?  
+After creating a `.cr7` file, run the interpreter with the command:  
 ```bash
 py main.py program.cr7
-````
+```
 
-### 3. Co zrobić, gdy pojawia się błąd składniowy z komunikatem zaczynającym się od "CULPA"?
+### 3. What should I do if I encounter a syntax error starting with "CULPA"?
 
-To jest spersonalizowany komunikat błędu składniowego w naszym języku.
-Sprawdź podaną linię i kolumnę w pliku, aby zobaczyć, gdzie jest problem.
-Przykładowo:
+This is a customized syntax error message in our language.  
+Check the specified line and column in the file to identify the issue. For example:
 
 ```
 CULPA: linea 5:10 - syntax error at 'ad'  
 ```
 
-oznacza, że na linii 5, kolumnie 10 jest błąd składniowy związany z tokenem `'ad'`.
+indicates a syntax error on line 5, column 10, related to the token `'ad'`.
 
-### 4. Czy Scriptorium obsługuje programowanie obiektowe lub moduły?
+### 4. Does Scriptorium support object-oriented programming or modules?
 
-Obecnie Scriptorium jest językiem proceduralnym bez wsparcia dla OOP, modułów czy bibliotek zewnętrznych.
+Currently, Scriptorium is a procedural language without support for OOP, modules, or external libraries.
 
-### 5. Jak obsługiwać zmienne i typy danych?
+### 5. How do I handle variables and data types?
 
-Deklarujesz zmienne podając typ przed nazwą, np.:
+You declare variables by specifying the type before the name, e.g.:
 
 ```
 numerus x.
 ```
 
-lub z definicją:
+or with a definition:
 
 ```
 numerus x esto 5.
 ```
 
-Dostępne typy to: `numerus` (int), `fractio` (float), `sententia` (string), `veritas` (bool) oraz `nihil` (null).
+Available types are: `numerus` (int), `fractio` (float), `sententia` (string), `veritas` (bool), and `nihil` (null).
 
-### 6. Jak definiować i wywoływać funkcje?
+### 6. How do I define and call functions?
 
-Funkcje definiujesz słowem kluczowym `munus`, np.:
+Functions are defined using the keyword `munus`, e.g.:
 
 ```
 numerus munus suma(numerus a, numerus b):
     scribere a ad b.
 ```
 
-Wywołujesz funkcje przez nazwę i nawiasy:
+Call functions using their name and parentheses:
 
 ```
 suma(3, 5).
 ```
 
-### 7. Jak działają pętle i instrukcje warunkowe?
+### 7. How do loops and conditional statements work?
 
-* Pętla `dum` (while)
-* Pętla `repetere` (for)
-* Instrukcje warunkowe `si`, `aliter si`, `aliter`
+* `dum` loop (while)
+* `repetere` loop (for)
+* Conditional statements: `si`, `aliter si`, `aliter`
 
-Przykład:
+Example:
 
 ```
 si x maior quam 0:
-    scribere "Dodatni".
+    scribere "Positive".
 aliter:
-    scribere "Niedodatni".
+    scribere "Non-positive".
 ```
 
-### 8. Czy jest wsparcie dla obsługi błędów?
+### 8. Is there support for error handling?
 
-Tak, interpreter wychwytuje błędy składniowe i semantyczne, które są raportowane z precyzyjną lokalizacją w kodzie.
+Yes, the interpreter catches syntax and semantic errors, which are reported with precise code locations.
 
-### 9. Jak dodać nowe funkcjonalności lub zgłosić błąd?
+### 9. How can I add new features or report a bug?
 
-Prosimy o zgłoszenie issue na GitHub lub kontakt mailowy (adres w dokumentacji projektu).
+Please submit an issue on GitHub or contact us via email (address in the project documentation).
 
 ---
 
-Jeśli masz inne pytania, zajrzyj do dokumentacji lub skontaktuj się z nami!
+If you have other questions, check the documentation or contact us!
 
+## Summary
 
-## Podsumowanie
+Scriptorium is a simple, procedural programming language created for educational purposes and rapid prototyping. With its clear, Latin-inspired syntax and precise error handling, users can quickly identify and fix issues in their code.
 
-Scriptorium to prosty, proceduralny język programowania stworzony z myślą o edukacji i szybkim prototypowaniu. Dzięki czytelnej składni inspirowanej łaciną i precyzyjnej obsłudze błędów, użytkownik szybko zidentyfikuje i poprawi problemy w kodzie.  
+The project is based on ANTLR4 and Python 3.13, ensuring easy extensibility and integration.  
+The introduction of basic data types, functions, loops, and conditions enables the creation of clear and understandable programs.
 
-Projekt opiera się na ANTLR4 oraz Pythonie 3.13, co zapewnia łatwą rozbudowę i integrację.  
-Wprowadzenie podstawowych typów danych, funkcji, pętli oraz warunków pozwala na tworzenie czytelnych i zrozumiałych programów.
+We hope this documentation will make it easier for you to start working with Scriptorium and make programming a pleasure.
 
-Mamy nadzieję, że dokumentacja ułatwi Ci rozpoczęcie pracy z Scriptorium i sprawi, że tworzenie programów będzie przyjemnością.
+We invite you to experiment and develop the language!
 
-Zapraszamy do eksperymentowania i rozwijania języka!
