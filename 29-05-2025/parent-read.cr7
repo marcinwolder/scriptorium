@@ -1,0 +1,4 @@
+repetere x ex 0 ad 10:
+	scribere "->" et x.
+	repetere x ex 0 ad 10:
+		scribere x.

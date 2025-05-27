@@ -24,16 +24,28 @@ class Var:
             self.value[recursion_level] = value
 
     @staticmethod
-    def nearest_scope_variable(ctx, var_map, return_parent_ctx=False):
+    def nearest_scope_variable(ctx, var_map, return_parent_ctx=False, name="", scope=0):
+        var_name = name if name != "" else ctx.NAME().getText()
         parent_ctx = ctx
         while parent_ctx is not None:
             if parent_ctx in var_map.keys() and \
-                ctx.NAME().getText() in var_map[parent_ctx].keys():
-                if return_parent_ctx: return (var_map[parent_ctx][ctx.NAME().getText()], parent_ctx)
-                return var_map[parent_ctx][ctx.NAME().getText()]
+                var_name in var_map[parent_ctx].keys():
+                if return_parent_ctx: return (var_map[parent_ctx][var_name], parent_ctx)
+                return var_map[parent_ctx][var_name]
             parent_ctx = parent_ctx.parentCtx
-        raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{ctx.NAME().getText()}\"")
+        raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{var_name}\" was defined"+(f" {scope} scope(s) ago" if scope != 0 else "in current scope"))
     
+    @staticmethod
+    def nth_nearest_scope(ctx, n):
+        parent_ctx = ctx
+        scope_level = n
+        while n >= 0:
+            if parent_ctx.parentCtx is None:
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - cannot move {scope_level} scope(s) ago - no such scope defined")
+            parent_ctx = Var.nearest_scope(parent_ctx.parentCtx)
+            n -= 1
+        return parent_ctx
+
     @staticmethod
     def nearest_scope(ctx):
         parent_ctx = ctx

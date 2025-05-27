@@ -34,7 +34,7 @@ def nextToken(self):
 start: action* EOF;
 
 action: variableDeclaration
-      | variableDefinition
+      | parentVariableDefinition
       | if
       | forLoop
       | whileLoop
@@ -58,12 +58,18 @@ expr: boolExpr
     | varExpr    
     ;
 
-varExpr: NAME ;
+varExpr: PARENT* NAME ;
+
+castedExpr: (INT|FLOAT|STRING|BOOL|functionInvocation|varExpr) AS type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE)  #CastedValue
+          | castedExpr AS type=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE)                                          #CastedAgain
+          ;
 
 stringExpr
     : STRING                      #String
     | stringExpr ADD stringExpr   #StringAdd
     | varExpr                     #StringVar
+    | castedExpr                  #StringCast
+    | functionInvocation          #StringFunc
     ;
 
 numericExpr: INT                                        #NumericInt
@@ -75,6 +81,7 @@ numericExpr: INT                                        #NumericInt
            | numericExpr op=(ADD|SUB) numericExpr       #NumericAddSub
            | numericExpr MOD numericExpr                #NumericMod
            | varExpr                                    #NumericVar
+           | castedExpr                                 #NumericCast
            | functionInvocation                         #NumericFunc
            ;
 intExpr: numericExpr #Int ;
@@ -89,6 +96,7 @@ boolExpr: BOOL                                              #Bool
         | stringExpr op=(LT|LE|GT|GE|EQ|NEQ) stringExpr     #StringLogic
         | numericExpr op=(LT|LE|GT|GE|EQ|NEQ) numericExpr   #NumericLogic
         | varExpr                                           #BoolVar
+        | castedExpr                                        #BoolCast
         | functionInvocation                                #BoolFunc
         ;
 
@@ -112,6 +120,7 @@ continueStatement: CONTINUE DOT NL;
 variableDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) variableDefinition
                    | varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME DOT NL;
 variableDefinition: NAME IS expr DOT NL;
+parentVariableDefinition: PARENT* variableDefinition ;
 
 if: ifBlock ifElseBlock* elseBlock?;
 
@@ -128,6 +137,11 @@ print: PRINT printExpr DOT NL;
 printExpr: expr                                 #ExprInPrint
          | printExpr PRINT_SEPARATOR printExpr  #PrintAdd
          ;
+
+any: INT 
+   | FLOAT 
+   | STRING 
+   | BOOL ;
 
 // LEXER
 
@@ -160,6 +174,10 @@ INT_TYPE: 'numerus' ;
 FLOAT_TYPE: 'fractio' ;
 BOOL_TYPE: 'veritas' ;
 STRING_TYPE: 'sententia' ;
+
+PARENT: 'parentes' ;
+
+AS: 'ut' ;
 
 NULL: 'nihil' ;
 
