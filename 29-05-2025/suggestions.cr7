@@ -1,2 +1,8 @@
-reptere i ex 1 ad 10:
-	scribere i.
+repere i ex 1 ad 10:
+	//scribere i.
+	si i minor quam 3:
+		scriere i et "< 3".
+	alier si i maior quam 6:
+		scribere i et "> 6".
+	aliter:
+		scribere "3 >=" et i et ">= 6".

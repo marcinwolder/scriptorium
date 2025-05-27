@@ -32,7 +32,7 @@ class Visitor(ScriptoriumVisitor):
         print(self.visit(ctx.printExpr()))
 
     def visitPrintAdd(self, ctx):
-        return self.visit(ctx.printExpr(0))+', '+self.visit(ctx.printExpr(1))        
+        return self.visit(ctx.printExpr(0))+' '+self.visit(ctx.printExpr(1))        
     
     def visitExprInPrint(self, ctx):
         return str(self.visit(ctx.expr()))
@@ -206,7 +206,7 @@ class Visitor(ScriptoriumVisitor):
 
     def visitVarExpr(self, ctx):
         parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
-        
+
         try:
             (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
             recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
