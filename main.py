@@ -12,17 +12,18 @@ def main():
     input_stream = FileStream(sys.argv[1], encoding='utf-8')
     try:
         # print(0)
-
+        with open(sys.argv[1], encoding='utf-8') as f:
+            input_lines = f.readlines()
         lexer = ScriptoriumLexer(input_stream)
         lexer.removeErrorListeners()
-        lexer.addErrorListener(ErrorListener())
+        lexer.addErrorListener(ErrorListener(input_lines))
         token_stream = CommonTokenStream(lexer)
 
         # print(1)
 
         parser = ScriptoriumParser(token_stream)
         parser.removeErrorListeners()
-        parser.addErrorListener(ErrorListener())
+        parser.addErrorListener(ErrorListener(input_lines))
         parser.addParseListener(VariableListener(var_map))
         tree = parser.start()
 

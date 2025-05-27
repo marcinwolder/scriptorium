@@ -1,6 +1,7 @@
 import math
 import re
 from typing import List
+import difflib
 
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
@@ -32,10 +33,25 @@ class Visitor(ScriptoriumVisitor):
         print(self.visit(ctx.printExpr()))
 
     def visitPrintAdd(self, ctx):
-        return self.visit(ctx.printExpr(0))+', '+self.visit(ctx.printExpr(1))        
+        return self.visit(ctx.printExpr(0))+' '+self.visit(ctx.printExpr(1))        
     
     def visitExprInPrint(self, ctx):
         return str(self.visit(ctx.expr()))
+
+    # CAST
+
+    def visitCastedValue(self, ctx):
+        if ctx.functionInvocation():
+            value = self.visit(ctx.functionInvocation())
+        elif ctx.varExpr():
+            value = self.visit(ctx.varExpr())
+        else:
+            value = ctx.getChild(0).getText()
+        return cast_to_type(value, ctx.type_.type)
+    
+    def visitCastedAgain(self, ctx):
+        value = self.visit(ctx.castedExpr())
+        return cast_to_type(value, ctx.type_.type)
 
     # STRING
 
@@ -210,8 +226,13 @@ class Visitor(ScriptoriumVisitor):
 
     # VAR
 
-    def visitVariableDefinition(self, ctx):
-        (var, parent_ctx) = Var.nearest_scope_variable(ctx, self.var_map, return_parent_ctx=True)
+    def visitParentVariableDefinition(self, ctx):
+        scope_level = len(ctx.PARENT())
+        parent_level_ctx = Var.nth_nearest_scope(ctx, scope_level)
+        self.visitVariableDefinition(ctx.variableDefinition(), scope_ctx=parent_level_ctx, scope_level=scope_level)
+
+    def visitVariableDefinition(self, ctx, scope_ctx=None, scope_level=0):
+        (var, parent_ctx) = Var.nearest_scope_variable(scope_ctx if scope_ctx is not None else ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=scope_level)
         recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
         value = self.visit(ctx.expr())
         try:
@@ -221,8 +242,19 @@ class Visitor(ScriptoriumVisitor):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
 
     def visitVarExpr(self, ctx):
-        (var, parent_ctx) = Var.nearest_scope_variable(ctx, self.var_map, return_parent_ctx=True)
-        recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
+        parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
+
+        try:
+            (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
+            recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
+        except Exception as e:
+            all_names = list(self.var_map.get(parent_level_ctx, {}).keys())
+            suggestion = difflib.get_close_matches(ctx.NAME().getText(), all_names, n=1)
+            msg = str(e)
+            if suggestion:
+                msg += f' (Did you mean "{suggestion[0]}"?)'
+            raise Exception(msg)
+        
         if len(var.value) < recursion_level+1:
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" is not yet defined")
         return var.value[recursion_level]
@@ -230,7 +262,7 @@ class Visitor(ScriptoriumVisitor):
     # INPUT
 
     def visitInputExpr(self, ctx):
-        return input(self.visit(ctx.printExpr()))
+        return input(self.visit(ctx.printExpr())+" ")
     
     # FUNCTIONS
 
@@ -305,16 +337,17 @@ class Visitor(ScriptoriumVisitor):
         end = int(self.visit(ctx.to))
 
         var: Var = Var.nearest_scope_variable(ctx, self.var_map)
-
-        for i in range(start, end+1):
+        i = start
+        while i <= end:
             var.change_or_append_value(self.recursion_level, i)
             try:
                 self.visit(ctx.loopBlock())
             except Exception as e:
                 if e.args[0] == 'break':
                     return
-                else: 
+                else:
                     raise e
+            i += 1
 
     # WHILE LOOP
 
