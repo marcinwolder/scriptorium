@@ -33,7 +33,7 @@ class Var:
                 if return_parent_ctx: return (var_map[parent_ctx][var_name], parent_ctx)
                 return var_map[parent_ctx][var_name]
             parent_ctx = parent_ctx.parentCtx
-        raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{var_name}\" was defined"+(f" {scope} scope(s) ago" if scope != 0 else "in current scope"))
+        raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - no variable named \"{var_name}\" was defined"+(f" {scope} scope(s) ago" if scope != 0 else " in current scope"))
     
     @staticmethod
     def nth_nearest_scope(ctx, n):
