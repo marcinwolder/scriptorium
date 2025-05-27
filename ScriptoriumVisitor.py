@@ -58,11 +58,11 @@ class Visitor(ScriptoriumVisitor):
             if var_name not in self.var_map.get(parent_ctx, {}):
                 similar_vars = [name for name in self.var_map.get(parent_ctx, {}).keys()
                                if self.levenshtein(var_name, name) <= 2]
-                suggestion = f". Czy chodziło o jedną z tych zmiennych: {', '.join(similar_vars)}?" if similar_vars else ""
-                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - zmienna \"{var_name}\" nie została zadeklarowana{suggestion}")
+                suggestion = f". Did you mean to use one of these variables: {', '.join(similar_vars)}?" if similar_vars else ""
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable \"{var_name}\" was not declared{suggestion}")
             recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
             if len(self.var_map[parent_ctx][var_name].value) < recursion_level + 1:
-                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - zmienna \"{var_name}\" nie została zainicjalizowana")
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable \"{var_name}\" was not initialized")
             return str(self.var_map[parent_ctx][var_name].value[recursion_level])
         
         result = re.sub(r'\{([a-z_]+[a-zA-Z0-9_]*)\}', replace_var, text)
