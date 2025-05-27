@@ -218,11 +218,11 @@ Operators in Scriptorium are full words:
 
 #### Logical
 
-| Symbolic | Scriptorium |    |       |
-|----------|-------------|----|-------|
-| `&&`     | `etiam`     |    |       |
-| `||`     | `aut`       |    |       |
-| `!`      | `non`       |    |       |
+| Symbolic | Scriptorium |
+|----------|-------------|
+| `&&`     | `etiam`     |
+| <code>&#124;&#124;</code>     | `aut`       |
+| `!`      | `non`       |
 
 ---
 
