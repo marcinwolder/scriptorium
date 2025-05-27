@@ -144,14 +144,14 @@ scribere "Result: " et a et ".".
 Functions are defined using `munus`, specifying the return type, name, parameters, and action block:
 
 ```cr7
-numerus munus suma(numerus a, numerus b):
+numerus munus suma(numerus a et numerus b):
     reddere a adde b.
 ```
 
 Function call:
 
 ```cr7
-numerus wynik esto suma(5, 10).
+numerus wynik esto suma(5 et 10).
 ```
 
 ---
@@ -326,10 +326,10 @@ munus test():
 Functions	In	Scriptorium	are	represented as variables of type `FuncVar` (internally). They can be called the same way as variables:
 
 ```cr7
-numerus munus dodaj(numerus a, numerus b):
+numerus munus dodaj(numerus a et numerus b):
     reddere a adde b.
 
-numerus wynik esto dodaj(1, 2).
+numerus wynik esto dodaj(1 et 2).
 ```
 
 ---
@@ -525,14 +525,14 @@ Available types are: `numerus` (int), `fractio` (float), `sententia` (string), `
 Functions are defined using the keyword `munus`, e.g.:
 
 ```
-numerus munus suma(numerus a, numerus b):
-    scribere a ad b.
+numerus munus suma(numerus a et numerus b):
+    scribere a adde b.
 ```
 
 Call functions using their name and parentheses:
 
 ```
-suma(3, 5).
+suma(3 et 5).
 ```
 
 ### 7. How do loops and conditional statements work?
