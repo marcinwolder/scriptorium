@@ -1,4 +1,0 @@
-numerus x esto 5.
-numerus y esto 10.
-sententia msg esto "x = {x}, y = {y}".
-scribere msg.
