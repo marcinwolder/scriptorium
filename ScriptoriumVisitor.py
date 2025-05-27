@@ -1,5 +1,6 @@
 import math
 from typing import List
+import difflib
 
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
@@ -204,12 +205,21 @@ class Visitor(ScriptoriumVisitor):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
 
     def visitVarExpr(self, ctx):
-        parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
-        (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
-        recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
-        if len(var.value) < recursion_level+1:
-            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" is not yet defined")
-        return var.value[recursion_level]
+        try:
+            parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
+            (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
+            recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
+            if len(var.value) < recursion_level+1:
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" is not yet defined")
+            return var.value[recursion_level]
+        except Exception as e:
+            current_scope = Var.nearest_scope(ctx)
+            all_names = list(self.var_map.get(current_scope, {}).keys())
+            suggestion = difflib.get_close_matches(ctx.NAME().getText(), all_names, n=1)
+            msg = str(e)
+            if suggestion:
+                msg += f' (Did you mean "{suggestion[0]}"?)'
+            raise Exception(msg)
     
     # INPUT
 
@@ -289,16 +299,17 @@ class Visitor(ScriptoriumVisitor):
         end = int(self.visit(ctx.to))
 
         var: Var = Var.nearest_scope_variable(ctx, self.var_map)
-
-        for i in range(start, end+1):
+        i = start
+        while i <= end:
             var.change_or_append_value(self.recursion_level, i)
             try:
                 self.visit(ctx.loopBlock())
             except Exception as e:
                 if e.args[0] == 'break':
                     return
-                else: 
+                else:
                     raise e
+            i += 1
 
     # WHILE LOOP
 
