@@ -68,6 +68,7 @@ stringExpr
     : STRING                      #String
     | stringExpr ADD stringExpr   #StringAdd
     | varExpr                     #StringVar
+    | STRING_WITH_VAR             #StringWithVar
     | castedExpr                  #StringCast
     | functionInvocation          #StringFunc
     ;
@@ -167,6 +168,7 @@ MINUS: 'negans' ;
 INT: (PLUS|MINUS)? [0-9]+ ;
 FLOAT: (PLUS|MINUS)? [0-9]+ ',' [0-9]+ ;
 fragment ESC: '\\' ["\\] ;
+STRING_WITH_VAR: '"' (ESC | ~["\\\n] | '{' NAME '}')* '"' ;
 STRING: '"' (ESC | ~["\\\n])* '"' ;
 BOOL: ('verum'|'falsum') ;
 

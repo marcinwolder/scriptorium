@@ -1,4 +1,5 @@
 import math
+import re
 from typing import List
 import difflib
 
@@ -62,6 +63,42 @@ class Visitor(ScriptoriumVisitor):
 
     def visitStringAdd(self, ctx):
         return self.visit(ctx.stringExpr(0))+self.visit(ctx.stringExpr(1))
+
+    def visitStringWithVar(self, ctx):
+        text = ctx.STRING_WITH_VAR().getText()[1:-1]
+        text = text.replace("\\\\", "\\").replace("\\\"", "\"")
+        
+        def replace_var(match):
+            var_name = match.group(1)
+            parent_ctx = Var.nearest_scope(ctx)
+            if var_name not in self.var_map.get(parent_ctx, {}):
+                similar_vars = [name for name in self.var_map.get(parent_ctx, {}).keys()
+                               if self.levenshtein(var_name, name) <= 2]
+                suggestion = f". Did you mean to use one of these variables: {', '.join(similar_vars)}?" if similar_vars else ""
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable \"{var_name}\" was not declared{suggestion}")
+            recursion_level = Var.nearest_recursion_level(parent_ctx, self.var_map)
+            if len(self.var_map[parent_ctx][var_name].value) < recursion_level + 1:
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable \"{var_name}\" was not initialized")
+            return str(self.var_map[parent_ctx][var_name].value[recursion_level])
+        
+        result = re.sub(r'\{([a-z_]+[a-zA-Z0-9_]*)\}', replace_var, text)
+        return result
+
+    def levenshtein(self, s1, s2):
+        if len(s1) < len(s2):
+            return self.levenshtein(s2, s1)
+        if len(s2) == 0:
+            return len(s1)
+        previous_row = range(len(s2) + 1)
+        for i, c1 in enumerate(s1):
+            current_row = [i + 1]
+            for j, c2 in enumerate(s2):
+                insertions = previous_row[j + 1] + 1
+                deletions = current_row[j] + 1
+                substitutions = previous_row[j] + (c1 != c2)
+                current_row.append(min(insertions, deletions, substitutions))
+            previous_row = current_row
+        return previous_row[-1]
 
     # NUMERIC
 
