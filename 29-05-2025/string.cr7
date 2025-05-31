@@ -1,0 +1,3 @@
+numerus x esto 2 adde 2.
+//scribere parentes x.
+scribere "x=${parentes x}".

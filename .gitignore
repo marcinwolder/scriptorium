@@ -3,5 +3,6 @@ local
 __pycache__
 Scriptorium
 !Scriptorium/Scriptorium.g4
+!Scriptorium/ScriptoriumLexer.g4
 **/*.cr7
 !*-2025/*.cr7
