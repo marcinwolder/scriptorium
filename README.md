@@ -228,12 +228,6 @@ Operators in Scriptorium are full words:
 
 ### 📌 Special Instructions
 
-* `culpa`: outputs an error
-
-```cr7
-culpa "This should not happen!".
-```
-
 * `reddere`: returns a value from a function
 * `exire`: breaks a loop (`break`)
 * `perge`: continues to the next iteration (`continue`)
