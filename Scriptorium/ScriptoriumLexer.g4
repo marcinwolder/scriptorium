@@ -1,5 +1,33 @@
 lexer grammar ScriptoriumLexer;
 
+@lexer::header{
+from antlr_denter.DenterHelper import DenterHelper
+from Scriptorium.ScriptoriumParser import ScriptoriumParser
+}
+@lexer::members {
+class ScriptoriumDenter(DenterHelper):
+    def __init__(self, lexer, nl_token, indent_token, dedent_token, ignore_eof):
+        super().__init__(nl_token, indent_token, dedent_token, ignore_eof)
+        self.lexer: ScriptoriumLexer = lexer
+
+    def pull_token(self):
+        buf = super(ScriptoriumLexer, self.lexer).nextToken()
+        # print(buf)
+        return buf
+
+denter = None
+
+def nextToken(self):
+    if not self.denter:
+        self.denter = self.ScriptoriumDenter(self, self.NL, ScriptoriumParser.INDENT, ScriptoriumParser.DEDENT, False)
+    buf = self.denter.next_token()
+    # print(buf)
+    return buf
+
+}
+
+tokens { INDENT, DEDENT }
+
 PRINT_SEPARATOR: 'et' ;
 ERROR: 'culpa' ;
 FUNCTION: 'munus' ;

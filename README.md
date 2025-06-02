@@ -8,7 +8,7 @@ Scriptorium is an original, experimental programming language inspired by the sy
 
 ### ⚙ System Requirements
 
-- Python **3.13**
+- Python **3.8+**
 - System: Windows, Linux, or macOS
 - Java (required by ANTLR): minimum Java 8
 
@@ -19,7 +19,7 @@ Scriptorium is an original, experimental programming language inspired by the sy
 1. **Create a virtual environment** (recommended):
 
 ```bash
-py -3.13 -m venv venv
+py -m venv venv
 source venv/Scripts/activate       # Windows
 # or
 source venv/bin/activate           # Linux/macOS
@@ -134,7 +134,13 @@ fractio zmienna.
 The keyword `scribere` is used for output. Multiple values can be combined using `et`:
 
 ```cr7
-scribere "Result: " et a et ".".
+scribere "Result: " et a et ".". // Output "Result: 2 ."
+```
+
+There is also a way of printing similar to string templating:
+
+```cr7
+scribere "x = ${x}.". // Output: "x = 2."
 ```
 
 ---
@@ -298,7 +304,12 @@ sententia imie esto rogare "Enter name: ".
 
 ### 🔀 Conversions (Explicit)
 
-Currently, the language does not support direct type casting in the code – all conversions must be handled explicitly by the interpreter.
+Type casting is available using `ut` keyword.
+
+```scriptorium
+fractio x esto 4,5 ut numerus.
+scribere x. // Result: "4.0"
+```
 
 ---
 
@@ -307,10 +318,22 @@ Currently, the language does not support direct type casting in the code – all
 Variables are visible only in the **nearest block** (`if`, `for`, `munus`, etc.). Access to variables from higher levels follows the nested scope principle.
 
 ```cr7
-numerus globalna esto 5.
+numerus global esto 5.
 
 munus test():
-    scribere globalna.  // ✔ Access to variable from higher scope
+    scribere global.  // ✔ Access to variable from higher scope
+```
+
+There is a possibility to declare variables with same names but in different scopes. There is a `parentes` keyword to access variable at parent scope.
+
+```scriptorium
+numerus x esto 1.
+nihil munus func():
+    numerus x esto 2.
+    scribere x. // Result: "2"
+    scribere parentes x. // Result: "1"
+    scribere parentes parentes x. // CULPA: linea 6:10 - cannot move 2 scope(s) ago - no such scope defined
+func().
 ```
 
 ---
@@ -320,10 +343,10 @@ munus test():
 Functions	In	Scriptorium	are	represented as variables of type `FuncVar` (internally). They can be called the same way as variables:
 
 ```cr7
-numerus munus dodaj(numerus a et numerus b):
+numerus munus sum(numerus a et numerus b):
     reddere a adde b.
 
-numerus wynik esto dodaj(1 et 2).
+numerus result esto sum(1 et 2).
 ```
 
 ---
@@ -519,14 +542,14 @@ Available types are: `numerus` (int), `fractio` (float), `sententia` (string), `
 Functions are defined using the keyword `munus`, e.g.:
 
 ```
-numerus munus suma(numerus a et numerus b):
+numerus munus sum(numerus a et numerus b):
     scribere a adde b.
 ```
 
 Call functions using their name and parentheses:
 
 ```
-suma(3 et 5).
+sum(3 et 5).
 ```
 
 ### 7. How do loops and conditional statements work?
@@ -560,7 +583,7 @@ If you have other questions, check the documentation or contact us!
 
 Scriptorium is a simple, procedural programming language created for educational purposes and rapid prototyping. With its clear, Latin-inspired syntax and precise error handling, users can quickly identify and fix issues in their code.
 
-The project is based on ANTLR4 and Python 3.13, ensuring easy extensibility and integration.  
+The project is based on ANTLR4 and Python 3.8, ensuring easy extensibility and integration.  
 The introduction of basic data types, functions, loops, and conditions enables the creation of clear and understandable programs.
 
 We hope this documentation will make it easier for you to start working with Scriptorium and make programming a pleasure.

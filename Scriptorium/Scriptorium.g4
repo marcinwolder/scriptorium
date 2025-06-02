@@ -1,34 +1,6 @@
 grammar Scriptorium;
 
 options { tokenVocab = ScriptoriumLexer; }
-tokens { INDENT, DEDENT }
-
-@lexer::header{
-from antlr_denter.DenterHelper import DenterHelper
-from Scriptorium.ScriptoriumParser import ScriptoriumParser
-}
-@lexer::members {
-class ScriptoriumDenter(DenterHelper):
-    def __init__(self, lexer, nl_token, indent_token, dedent_token, ignore_eof):
-        super().__init__(nl_token, indent_token, dedent_token, ignore_eof)
-        self.lexer: ScriptoriumLexer = lexer
-
-    def pull_token(self):
-        buf = super(ScriptoriumLexer, self.lexer).nextToken()
-        # print(buf)
-        return buf
-
-denter = None
-
-def nextToken(self):
-    if not self.denter:
-        self.denter = self.ScriptoriumDenter(self, self.NL, ScriptoriumParser.INDENT, ScriptoriumParser.DEDENT, False)
-    buf = self.denter.next_token()
-    # print(buf)
-    return buf
-
-}
-
 
 // PARSER
 
@@ -40,13 +12,14 @@ action: variableDeclaration
       | forLoop
       | whileLoop
       | functionDeclaration
-      | functionInvocation DOT NL
+      | functionInvocation
       | print
       | errorStatement
       | returnStatement
       | continueStatement
       | breakStatement
       | COMMENT
+      | NL
       ;
 
 templateString
@@ -120,8 +93,8 @@ nullExpr: NULL #Null ;
 errorStatement: ERROR printExpr DOT NL;
 
 funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
-functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam? (COMMA funcParam)* RP COLON actionBlock ;
-functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP ;
+functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam? (PRINT_SEPARATOR funcParam)* RP COLON actionBlock ;
+functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP DOT NL;
 
 returnStatement: RETURN expr? DOT NL ;
 
