@@ -5,6 +5,23 @@ from Scriptorium.ScriptoriumParser import ScriptoriumParser
 class Var:
     @staticmethod
     def nearest_recursion_level(ctx, var_map):
+        """
+        Determines the recursion level of the nearest function declaration context.
+
+        This function moves up through the parent contexts of the given `ctx` to locate the nearest
+        function declaration context. Once found, it retrieves the recursion level of the
+        corresponding function variable from the `var_map`.
+
+        Args:
+            ctx: The current context object, typically an instance of a parser context.
+            var_map: A dictionary mapping scope contexts to variable mappings. Each variable
+                 mapping contains function variables with their associated recursion levels.var_map (dict): A mapping of contexts to their defined variables. 
+                      Each key is a context, and each value is a dictionary of variable names to their Var objects.
+
+        Returns:
+            int: The recursion level of the nearest function declaration context. If no function
+             declaration context is found, returns 0.
+        """
         recursion_level = 0
         parent_ctx = ctx
         while parent_ctx is not None:
@@ -25,6 +42,28 @@ class Var:
 
     @staticmethod
     def nearest_scope_variable(ctx, var_map, return_parent_ctx=False, name="", scope=0):
+        """
+        Searches for the nearest variable definition in the current or parent scopes.
+
+        Args:
+            ctx: The current context object, typically representing a scope or block.
+            var_map (dict): A mapping of contexts to their defined variables. 
+                            Each key is a context, and each value is a dictionary of variable names to their Var objects.
+            return_parent_ctx (bool, optional): If True, returns a tuple containing the variable value and its parent context.
+                                                Defaults to False.
+            name (str, optional): The name of the variable to search for. If empty, the variable name is extracted from `ctx`.
+                                  Defaults to an empty string.
+            scope (int, optional): The number of scopes to go back for the search. Used for error reporting purposes.
+                                   Defaults to 0.
+
+        Returns:
+            The Var object of the nearest variable matching the name in the current or parent scopes.
+            If `return_parent_ctx` is True, returns a tuple (variable_object, parent_context).
+
+        Raises:
+            Exception: If the variable is not found in the current or parent scopes, an exception is raised with details
+                       about the line and column of the context and the scope depth.
+        """
         var_name = name if name != "" else ctx.NAME().getText()
         parent_ctx = ctx
         while parent_ctx is not None:
@@ -37,6 +76,24 @@ class Var:
     
     @staticmethod
     def nth_nearest_scope(ctx, n):
+        """
+        Retrieves the nth nearest scope from the given context.
+
+        This function navigates up the scope hierarchy starting from the provided
+        context (`ctx`) to find the nth nearest scope. If the requested scope level
+        exceeds the available parent scopes, an exception is raised.
+
+        Args:
+            ctx: The current context object.
+            n (int): The number of scopes to move up from the current context.
+
+        Returns:
+            The context object representing the nth nearest scope.
+
+        Raises:
+            Exception: If the requested scope level exceeds the available parent
+                       scopes, an exception is raised.
+        """
         parent_ctx = ctx
         scope_level = n
         while n >= 0:
@@ -48,6 +105,17 @@ class Var:
 
     @staticmethod
     def nearest_scope(ctx):
+        """
+        Determines the nearest enclosing scope for a given context.
+        This function traverses the parent contexts of the given `ctx` object
+        until it finds a context that matches one of the predefined scope types.
+        If no matching scope is found, it returns the topmost parent context.
+        Args:
+            ctx: The current context object.
+        Returns:
+            The nearest enclosing scope context object that matches one of the
+            predefined scope types.
+        """
         parent_ctx = ctx
         
         while parent_ctx.parentCtx is not None:

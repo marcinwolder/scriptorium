@@ -12,7 +12,7 @@ action: variableDeclaration
       | forLoop
       | whileLoop
       | functionDeclaration
-      | functionInvocation
+      | functionInvocation DOT NL
       | print
       | errorStatement
       | returnStatement
@@ -39,7 +39,6 @@ expr: boolExpr
     | floatExpr     
     | intExpr       
     | stringExpr       
-    | nullExpr      
     | inputExpr
     | functionInvocation
     | varExpr    
@@ -88,13 +87,11 @@ boolExpr: BOOL                                              #Bool
         | functionInvocation                                #BoolFunc
         ;
 
-nullExpr: NULL #Null ;
-
 errorStatement: ERROR printExpr DOT NL;
 
 funcParam: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE) NAME ;
 functionDeclaration: varType=(INT_TYPE|FLOAT_TYPE|STRING_TYPE|BOOL_TYPE|NULL) FUNCTION NAME LP funcParam? (PRINT_SEPARATOR funcParam)* RP COLON actionBlock ;
-functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP DOT NL;
+functionInvocation: NAME LP expr? (PRINT_SEPARATOR expr)* RP;
 
 returnStatement: RETURN expr? DOT NL ;
 

@@ -45,6 +45,8 @@ class Visitor(ScriptoriumVisitor):
             value = self.visit(ctx.functionInvocation())
         elif ctx.varExpr():
             value = self.visit(ctx.varExpr())
+        elif ctx.templateString():
+            value = self.visit(ctx.templateString())
         else:
             value = ctx.getChild(0).getText()
         return cast_to_type(value, ctx.type_.type)
@@ -238,7 +240,7 @@ class Visitor(ScriptoriumVisitor):
                 msg += f' (Did you mean "{suggestion[0]}"?)'
             raise Exception(msg)
         
-        if len(var.value) < recursion_level+1:
+        if len(var.value) < recursion_level+1 or var.value[recursion_level] is None:
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - variable named \"{ctx.NAME().getText()}\" is not yet defined")
         return var.value[recursion_level]
     
