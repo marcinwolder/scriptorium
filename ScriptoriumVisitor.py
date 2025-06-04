@@ -253,6 +253,8 @@ class Visitor(ScriptoriumVisitor):
 
     def visitFunctionInvocation(self, ctx):
         function_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map)
+        if not function_var.value:
+            raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - function named \"{ctx.NAME().getText()}\" is not yet defined")
         parameters = self.var_map[function_var.function_ctx].values() if function_var.function_ctx in self.var_map.keys() else []
         parameters = [var for var in parameters if type(var) == ParamVar]
         arguments = ctx.expr()
@@ -276,7 +278,8 @@ class Visitor(ScriptoriumVisitor):
             raise e
 
     def visitFunctionDeclaration(self, ctx):
-        ...
+        func_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map)
+        func_var.value.append(1)
 
     def visitReturnStatement(self, ctx):
         result = None
