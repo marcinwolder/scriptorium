@@ -1,0 +1,45 @@
+// Test 1: Simple for loop
+scribere "TEST 1".
+repetere i ex 1 ad 10:
+	scribere i.
+
+// Test 2: For loop with varaibles and negative numbers
+scribere "TEST 2".
+numerus x esto negans 5.
+numerus y esto 5.
+repetere i ex x ad y:
+	scribere i.
+
+// Test 3: Break and continue statements
+scribere "TEST 3".
+repetere i ex 0 ad 5:
+	si i aequalis 3:
+		perge.
+	si i aequalis 7:
+		exire.
+	scribere i.
+
+// Test 4: Nested for loops
+scribere "TEST 4".
+repetere i ex 0 ad 10:
+	repetere j ex 0 ad 10:
+		si i aequalis j:
+			scribere i multiplica j.
+
+// Test 5: Empty iteration
+scribere "TEST 5".
+repetere i ex 10 ad 1:
+	scribere i.
+
+// Test 6: The variable u is overwritten with the correct value before each loop iteration
+scribere "TEST 6".
+repetere u ex 0 ad 5:
+	u esto 2.
+	scribere u.
+
+// Test 7: Very large range (error should not occur)
+scribere "TEST 7".
+repetere i ex 0 ad 1000000000000000000000000000000000000000000000000000000000:
+	si i maior quam 10:
+		exire.
+	scribere i.

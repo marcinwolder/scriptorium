@@ -1,0 +1,14 @@
+numerus a esto rogare "Podaj liczbę a:".
+numerus b esto rogare "Podaj liczbę b:".
+
+numerus munus nwd(numerus a et numerus b):
+	si a aequalis b:
+		reddere a.
+	aliter:
+		si a maior quam b:
+			a esto a minue b.
+		aliter:
+			b esto b minue a.
+		reddere nwd(a et b).
+
+scribere nwd(a et b).

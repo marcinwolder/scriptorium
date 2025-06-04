@@ -1,6 +1,6 @@
 numerus year esto 2025.
 
-nihil munus hello(sententia name, numerus age):
+nihil munus hello(sententia name et numerus age):
 	nihil munus test(sententia name):
 		scribere name.
 	test("HAHAHA").
