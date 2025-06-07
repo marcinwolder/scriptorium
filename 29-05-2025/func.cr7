@@ -1,3 +1,4 @@
 numerus a esto 5.
 nihil munus func(numerus x):
 	scribere x.
+func(2).
