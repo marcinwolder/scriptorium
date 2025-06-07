@@ -155,7 +155,7 @@ class FuncVar(Var):
         self.recursion_level = -1
     
     def __str__(self):
-        return f"<FuncVar: typeId={self.type_id}, value={self.value}, returnType={self.return_type}>"
+        return f"<FuncVar: typeId={self.type_id}, functionCtx={self.function_ctx}, returnType={self.return_type}>"
     
 class ParamVar(Var):
     def __str__(self):

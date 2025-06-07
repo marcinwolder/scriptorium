@@ -27,8 +27,12 @@ def main():
         parser.addParseListener(VariableListener(var_map))
         tree = parser.start()
 
+        if sys.argv[2] == "tree":
+            from dot_tree import tree_to_dot
+            tree_to_dot(tree, parser, outfile="tree.dot", to_png=True)
+            print(var_map)
+
         # print(2)
-        # print(var_map)
         # print("===")
 
         visitor = Visitor(var_map)

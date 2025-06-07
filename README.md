@@ -1,4 +1,4 @@
-# 🪶 Scriptorium
+# 🖋 Scriptorium
 
 Scriptorium is an original, experimental programming language inspired by the syntax of imperative languages (such as Python or C), equipped with its own parser, lexer, and interpreter based on ANTLR4. It supports variables, functions (with recursion), loops, and flow control. The project serves as a foundation for learning about programming language construction, syntactic and semantic analysis, and as an educational tool.
 
@@ -9,51 +9,6 @@ Scriptorium is an original, experimental programming language inspired by the sy
 ### ⚙ System Requirements
 
 - Python **3.8+**
-- System: Windows, Linux, or macOS
-- Java (required by ANTLR): minimum Java 8
-
----
-
-### 📚 Installing Dependencies
-
-1. **Create a virtual environment** (recommended):
-
-```bash
-py -m venv venv
-source venv/Scripts/activate       # Windows
-# or
-source venv/bin/activate           # Linux/macOS
-```
-
-2. **Install required modules**:
-
-```bash
-pip install -r requirements.txt
-```
-
-> 📄 Ensure that the `requirements.txt` file contains:
->
-> * `antlr4-tools`
-> * `antlr4-python3-runtime`
-> * `antlr-denter`
-
----
-
-### 🛠️ Compiling the ANTLR Grammar
-
-The parser and visitor are generated from the `Scriptorium.g4` grammar file. To build the project:
-
-```bash
-cd ./Scriptorium
-antlr4 ./Scriptorium.g4 -visitor -Dlanguage=Python3
-```
-
-After this operation, the following files should appear in the directory:
-
-* `ScriptoriumParser.py`
-* `ScriptoriumLexer.py`
-* `ScriptoriumVisitor.py`
-* `ScriptoriumListener.py`
 
 ---
 
@@ -82,28 +37,6 @@ CULPA: linea 1:18 - missing NL at 'numerus'
 
 ---
 
-### 🧰 Developer Tools
-
-If you use a code editor like VSCode, you can take advantage of extensions for:
-
-* Support for `.g4` syntax (ANTLR)
-* Support for `venv` environments
-* Python debugger
-
----
-
-### 🔧 Troubleshooting and Debugging
-
-* If the `antlr4` command is not available in the terminal, add ANTLR to the environment variables.
-* Ensure your Java version is up to date (`java -version`).
-* If ANTLR generates files to a different directory, use the `-o .` flag in the command:
-
-```bash
-antlr4 -Dlanguage=Python3 -visitor -o . Scriptorium.g4
-```
-
----
-
 Ready! Now you can write programs in `.cr7` and run them using your own interpreter 🎉
 
 ## 🧾 Syntax and Basics
@@ -118,13 +51,13 @@ Variables are declared using a type (`numerus`, `fractio`, `veritas`, `sententia
 
 ```cr7
 numerus a esto 10.
-sententia powitanie esto "salve".
+sententia x esto "salve".
 ```
 
 Declaration without assignment:
 
 ```cr7
-fractio zmienna.
+fractio var.
 ```
 
 ---
@@ -150,14 +83,14 @@ scribere "x = ${x}.". // Output: "x = 2."
 Functions are defined using `munus`, specifying the return type, name, parameters, and action block:
 
 ```cr7
-numerus munus suma(numerus a et numerus b):
+numerus munus sum(numerus a et numerus b):
     reddere a adde b.
 ```
 
 Function call:
 
 ```cr7
-numerus wynik esto suma(5 et 10).
+numerus wynik esto sum(5 et 10).
 ```
 
 ---
@@ -273,10 +206,10 @@ Scriptorium supports **statically typed** variables of four main data types and 
 Variables are assigned using `esto`:
 
 ```cr7
-numerus wiek esto 25.
+numerus age esto 25.
 fractio pi esto 3,14.
-sententia powitanie esto "salve!".
-veritas aktywne esto verum.
+sententia message esto "salve!".
+veritas active esto verum.
 ```
 
 ---
@@ -297,7 +230,7 @@ x esto "five".  // ❌ Error – type `sententia` incompatible with `numerus`
 The `rogare` keyword can be used to read user input. The result is always a `sententia`.
 
 ```cr7
-sententia imie esto rogare "Enter name: ".
+sententia name esto rogare "Enter name: ".
 ```
 
 ---

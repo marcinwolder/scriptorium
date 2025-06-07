@@ -35,13 +35,13 @@ interpolation
     : INTERP_START varExpr INTERP_END
     ;
 
-expr: boolExpr
+expr: varExpr
     | floatExpr     
     | intExpr       
     | stringExpr       
     | inputExpr
     | functionInvocation
-    | varExpr    
+    | boolExpr
     ;
 
 varExpr: PARENT* NAME ;
