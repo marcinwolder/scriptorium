@@ -8,25 +8,30 @@ Scriptorium is an original, experimental programming language inspired by the sy
 
 ### ⚙ System Requirements
 
-- Windows
+- Windows/Linux
 - Python 3.8+
 
 ### 📚 Installing
 
 - Copy **Scriptorium** repository into a folder on your machine
-- Create venv and install requirements
+- In main repository directory, create `./venv` folder for virtual environment and install requirements
 
     ```bash
     # Create `venv` folder with virtual environment
-    $ py -3.8 -m venv venv
+    $ py -3.8 -m venv venv # Replace `-3.8` with your Python version
+
     # Activate virtual environment
-    $ source venv/Scripts/activate
+    $ source venv/Scripts/activate # For Windows
+    $ source venv/bin/activate # For Linux
+    
     # Install all dependencies in virtual environment
     $ pip install -r requirements.txt
     ```
 
 - Add main repository folder path to `SCRIPTORIUM_HOME` environmental variable
-- Add `%SCRIPTORIUM_HOME%` into `PATH` environmental variable
+- Add scriptorium path to `PATH`
+    - For Windows: Add `%SCRIPTORIUM_HOME%\Windows`
+    - For Linux: Add `%SCRIPTORIUM_HOME%\Linux`
 
 ---
 
@@ -35,7 +40,7 @@ Scriptorium is an original, experimental programming language inspired by the sy
 1. Create a source file in the Scriptorium language with the `.cr7` extension:
 
 ```bash
-touch hello.cr7
+echo "scribere \"Hello world!\"." > hello.cr7
 ```
 
 2. Run the interpreter:
@@ -44,18 +49,13 @@ touch hello.cr7
 scriptorium hello.cr7
 ```
 
----
-
-### 🧪 Example Session
+3. Result should look like:
 
 ```bash
-$ scriptorium hello.cr7
-CULPA: linea 1:18 - missing NL at 'numerus'
+Hello world!
 ```
 
----
-
-Ready! Now you can write programs in `.cr7` and run them using your own interpreter 🎉
+You're ready! Now you can write programs in `.cr7` and run them using **Scriptorium** interpreter 🎉
 
 ## 🧾 Syntax and Basics
 
