@@ -1,0 +1,6 @@
+numerus i esto 0.
+dum i minor quam 10:
+	scribere i.
+	si i aequalis 3:
+		i esto i adde 5.
+	i esto i adde 1.

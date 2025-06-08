@@ -1,98 +1,92 @@
 # Scriptorium Interpreter Implementation Report
 
-In this document you can find details on how **🪶 Scriptorium** interpreter was created.
+In this document you can find details on how **Scriptorium** interpreter was created.
+
+**Scriptorium** is a compact, educational programming language designed to demonstrate an end‑to‑end interpreter pipeline built with **ANTLR 4** and a classic tree‑walk evaluator. Its syntax blends Python‑style indentation with Latin keywords (e.g. `scribere` for print, `si … aliter` for if/else).
 
 ## Table of Contents
 
 - [Scriptorium Interpreter Implementation Report](#scriptorium-interpreter-implementation-report)
   - [Table of Contents](#table-of-contents)
-  - [1. Variable Management (`Var` class)](#1-variable-management-var-class)
-    - [1.1. Variable classes](#11-variable-classes)
-      - [1.1.1. `Var` class](#111-var-class)
-      - [1.1.2. `ParamVar` class](#112-paramvar-class)
-      - [1.1.3. `FuncVar` class](#113-funcvar-class)
-    - [1.2. Use of `var_map`](#12-use-of-var_map)
-      - [1.2.1. List of scope tokens](#121-list-of-scope-tokens)
-    - [1.3. Storing stack of variable values](#13-storing-stack-of-variable-values)
-      - [1.3.1. How it works](#131-how-it-works)
-        - [1.3.1.1. Writing](#1311-writing)
-        - [1.3.1.2. Reading](#1312-reading)
-    - [1.4. Finding variables](#14-finding-variables)
-      - [1.4.1. `Var.nearest_scope_variable()` method](#141-varnearest_scope_variable-method)
-    - [1.5. Finding scopes](#15-finding-scopes)
-      - [1.5.1. `Var.nearest_scope()` method](#151-varnearest_scope-method)
-      - [1.5.2. `Var.nth_nearest_scope()` method](#152-varnth_nearest_scope-method)
-    - [1.6. Calculating current `recursion_level`](#16-calculating-current-recursion_level)
-      - [1.6.1. `Var.nearest_recursion_level()` method](#161-varnearest_recursion_level-method)
-  - [2. ANTLR Grammar](#2-antlr-grammar)
-    - [2.1. Indents](#21-indents)
-    - [2.2. String templating](#22-string-templating)
-    - [2.3. Possible value types](#23-possible-value-types)
-      - [2.3.1. Diagram of `expr` possible paths](#231-diagram-of-expr-possible-paths)
-      - [2.3.2. Type casting](#232-type-casting)
-        - [2.3.2.1. Automatic type casting](#2321-automatic-type-casting)
-        - [2.3.2.2. Manual type casting](#2322-manual-type-casting)
+  - [1. Build \& run](#1-build-run)
+  - [2. Execution model (two‑pass)](#2-execution-model-twopass)
+  - [3. Variable Management](#3-variable-management)
+    - [3.1. Scopes](#31-scopes)
+      - [3.1.1. List of scope tokens](#311-list-of-scope-tokens)
+    - [3.2. Use of `var_map`](#32-use-of-var_map)
+      - [3.2.1. Structure of `var_map`](#321-structure-of-var_map)
+      - [3.2.2. Example](#322-example)
+    - [3.3. Storing stack of variable values](#33-storing-stack-of-variable-values)
+      - [3.3.1. How it works](#331-how-it-works)
+        - [3.3.1.1. Writing](#3311-writing)
+        - [3.3.1.2. Reading](#3312-reading)
+    - [3.4. Variable classes](#34-variable-classes)
+      - [3.4.1. `Var` class](#341-var-class)
+        - [3.4.1.1. Attributes](#3411-attributes)
+      - [3.4.2. `ParamVar` class](#342-paramvar-class)
+        - [3.4.2.1. Attributes](#3421-attributes)
+      - [3.4.3. `Func` class](#343-func-class)
+        - [3.4.3.1. Attributes](#3431-attributes)
+    - [3.5. Finding variables](#35-finding-variables)
+      - [3.5.1. `VarMapObject.nearest_scope_variable()` method](#351-varmapobjectnearest_scope_variable-method)
+    - [3.6. Finding scopes](#36-finding-scopes)
+      - [3.6.1. `VarMapObject.nearest_scope()` method](#361-varmapobjectnearest_scope-method)
+      - [3.6.2. `VarMapObject.nth_nearest_scope()` method](#362-varmapobjectnth_nearest_scope-method)
+    - [3.7. Calculating current `recursion_level`](#37-calculating-current-recursion_level)
+      - [3.7.1. `VarMapObject.nearest_recursion_level()` method](#371-varmapobjectnearest_recursion_level-method)
+  - [4. ANTLR Grammar](#4-antlr-grammar)
+    - [4.1. Indents](#41-indents)
+    - [4.2. String templating](#42-string-templating)
+    - [4.3. Possible value types](#43-possible-value-types)
+      - [4.3.1. Diagram of `expr` possible paths](#431-diagram-of-expr-possible-paths)
+      - [4.3.2. Type casting](#432-type-casting)
+        - [4.3.2.1. Automatic type casting](#4321-automatic-type-casting)
+        - [4.3.2.2. Manual type casting](#4322-manual-type-casting)
 
+## 1. Build & run
 
-## 1. Variable Management (`Var` class)
+Scriptorium has a lexer, parser, visitor and listener auto-generated from Antlr4. To generate new versions use commands:
 
-### 1.1. Variable classes
+```bash
+# regenerate with antlr4 after grammar changes
+antlr4 -Dlanguage=Python3 ScriptoriumLexer.g4
+antlr4 -Dlanguage=Python3 Scriptorium.g4
 
-To manage scopes, variable types and all metadata of variable system there are following classes implemented:
-
-![Var class diagram](./AGH%20-%20TKK.png)
-
-#### 1.1.1. `Var` class
-
-This is a default variable class. It's used when declaring new variable in any scope and for iterator variable in `for` loop.
-
-#### 1.1.2. `ParamVar` class
-
-This is a variable class used for function parameters. It's used to distinguish variables defined inside function from function parameters.
-
-#### 1.1.3. `FuncVar` class
-
-In Scriptorium function is also a variable. It has additional fields:
-
-* `return_type` - Type of value returned from the function
-* `function_ctx` - Context of function node. Used for function invocation.
-* `recursion_level` - Used to determine which value to get from value stacks of other variables inside function scope (for recursion).
-
-### 1.2. Use of `var_map`
-
-To keep track of every variable in Scriptorium we use a dictionary. We have a list of tokens that we define as **"scope tokens"** (list of tokens below). Those tokens are keys in `var_map` dictionary. Then there is another dictionary where keys are variable names and values are `Var` objects.
-
-Structure of `var_map`:
-
-```python
-var_map: Dict[ctx, Dict[str, Var]]
+# execute a program
+scriptorium 03-04-2025/program.cr7
 ```
 
-*\* Where `ctx` is a type of node context object*
+## 2. Execution model (two‑pass)
 
-**Example:**  
+The interpreter runs in two distinct passes:
+
+1. **Declaration pass** — in this run `var_map` dictionary is populated with variable, parameter, and function signatures. This dictionary helps keep track of all variables in use.
+
+    > This part is managed in `Scriptorium/ScriptoriumVariableListener.py`.
+
+2. **Evaluation pass** — the visitor updates those `var_map` entries with runtime values, enabling forward references and precise scope resolution.
+
+    > This part is managed in `Scriptorium/ScriptoriumVisitor.py`.
+
+## 3. Variable Management
+
+The most important part of Scriptorium interpreter is a **variable management system**. There is a plenty of methods/classes created to help with process of defining, writing and reading variables or function invocation.
+
+### 3.1. Scopes
+
+Every variable and function in the code must be inside some kind of "scope". We decided to define "scope" in similar way like python does - **every indent level is a different "scope"**. But indents cannot be used without a special instruction. So new scope starts with every instruction that ends with `:` and creates indent block for example:
 
 ```scriptorium
-numerus a esto 5.
-nihil munus func(numerus x):
-    scribere x.
+si verum:
+  // NEW SCOPE HERE
+  numerus x esto 2.
+
+// You cannot access `x` from here 
 ```
 
-would result with `var_map` looking like this:
+#### 3.1.1. List of scope tokens
 
-```python
-{
-    <ctx of start node>: {
-        "a": <Var>,
-        "func": <FuncVar>
-    }
-    <ctx of function node>: {
-        "x": <ParamVar>
-    }
-}
-```
-
-#### 1.2.1. List of scope tokens
+Full list of instructions that create new scope:
 
 * `IfBlockContext` - If block scope
 * `IfElseBlockContext` - If else block scope
@@ -102,7 +96,59 @@ would result with `var_map` looking like this:
 * `FunctionDeclarationContext` - Function scope
 * `StartContext` - Global scope
 
-### 1.3. Storing stack of variable values
+So if there is a `ForLoopContext` token, it is automatically a scope for all variables and functions declared inside its action block.
+
+### 3.2. Use of `var_map`
+
+To keep track of every variable in Scriptorium we use a dictionary.  
+
+#### 3.2.1. Structure of `var_map`
+
+```python
+var_map: Dict[ctx, Dict[str, Var]]
+```
+*\* Where `ctx` is a type of node context object*
+
+We use **"scope tokens"** as keys in `var_map` dictionary.  
+Then there is another dictionary where keys are variable names and values are variable/function objects.
+
+```bash
+"var_map" dict  
+├─── KEY: "scope token"
+└─── VALUE: another dict
+    ├─── KEY: "name of variable/function"
+    └─── VALUE: variable/function object
+```
+
+#### 3.2.2. Example
+
+```scriptorium
+numerus a esto 5.
+nihil munus func(numerus x):
+    scribere x.
+```
+
+You can see the **"declaration"** nodes of variables, params and functions connected to their **"scope tokens"** nodes would look like this:
+
+<p align="center">
+  <img src="./tree.png" width="75%">
+</p>
+
+And thats why result `var_map` looks like this:
+
+```python
+{
+  <ScriptoriumParser.StartContext object at 0x000001AF6842AC80>: {
+    'a': <Var: typeId=23, value=[]>, 
+    'func': <Func: typeId=5, functionCtx=<ScriptoriumParser.FunctionDeclarationContext object at 0x000001AF684D5970>, returnType=29>
+  }, 
+  <ScriptoriumParser.FunctionDeclarationContext object at 0x000001AF684D5970>: {
+    'x': <ParamVar: typeId=23, value=[]>
+  }
+}
+```
+
+### 3.3. Storing stack of variable values
 
 Every variable in Scriptorium has it's own stack. We obtain a value from the stack based on recursion level:
 
@@ -110,9 +156,9 @@ Every variable in Scriptorium has it's own stack. We obtain a value from the sta
 current_value = some_var.value[recursion_level]
 ```
 
-#### 1.3.1. How it works
+#### 3.3.1. How it works
 
-##### 1.3.1.1. Writing
+##### 3.3.1.1. Writing
 
 When writing new value to the stack there are only two options
 
@@ -138,17 +184,61 @@ When writing new value to the stack there are only two options
     # var.value -> [15, None, 10]
     ```
 
-##### 1.3.1.2. Reading
+##### 3.3.1.2. Reading
 
-If given `Var` value stack is shorter than `recursion_level` or value on given index is `None`, then there is exception raised:
+If given variable value stack is shorter than `recursion_level` or value on given index is `None`, then there is exception raised:
 
 `CULPA: linea xx:yy - variable named "a" is not yet defined`
 
-### 1.4. Finding variables
+Otherwise value of `Var.value[recursion_level]` is returned
 
-When we need to read value of a variable we use a `Var.nearest_scope_variable()` static method. It searches through `var_map` until it finds a variable with specified name or raise an error when there is no variable with that name.
+### 3.4. Variable classes
 
-#### 1.4.1. `Var.nearest_scope_variable()` method
+Variable system is implemented in such a way that it automatically searches for right scope and finds if variable read instruction is in recurrence run - if it is, it checks what is the `recursion_level` and grabs right value from `value` stack of a variable.
+
+To manage all of that there are following classes implemented:
+
+<p align="center">
+  <img src="./AGH%20-%20TKK.png" width="75%">
+</p>
+
+#### 3.4.1. `Var` class
+
+This is a default variable class. It's used when declaring new variable in any scope and for iterator variable in `for` loop.
+
+##### 3.4.1.1. Attributes
+
+- `type_id` - id of **Scriptorium** type
+- `value` - list of variable values in a specific recurrence run
+- `declaration_position` - tuple (line, column) for better errors when double declaration occurs
+
+#### 3.4.2. `ParamVar` class
+
+This is a variable class used for function parameters. It's used to distinguish variables defined inside function from function parameters.
+
+##### 3.4.2.1. Attributes
+
+- `type_id` - id of **Scriptorium** type
+- `value` - list of variable values in a specific recurrence run
+- `declaration_position` - tuple (line, column) for better errors when double declaration occurs
+
+#### 3.4.3. `Func` class
+
+In Scriptorium function is also a `var_map` object. It helps to track right recursion level and has a information about function node context
+
+##### 3.4.3.1. Attributes
+
+- `type_id = 5` - id of **Scriptorium** function type
+- `declaration_position` - tuple (line, column) for better errors when double declaration occurs
+- `return_type` - id of **Scriptorium** type of value returned from the function
+- `function_ctx` - context of function node, used for function invocation
+- `recursion_level` - used to determine which value to get from value stacks of other variables inside function scope (for recursion)
+
+### 3.5. Finding variables
+
+When we need to read value of a variable we use a `VarMapObject.nearest_scope_variable()` static method. It searches through parse tree until it finds a "**scope token**" where there is a variable with specified name or raise an error when there is no variable with that name.
+
+#### 3.5.1. `VarMapObject.nearest_scope_variable()` method
 
 This method finds nearest variable with specified name. 
 
@@ -181,11 +271,11 @@ def nearest_scope_variable(ctx, var_map, return_parent_ctx=False, name="", scope
 
 **Why is parent context useful?** Because when searching for function recursion level you can start searching from variable parent context to avoid getting wrong recursion level value.
 
-### 1.5. Finding scopes
+### 3.6. Finding scopes
 
-When searching for scopes we look for [**"scope tokens"**](#121-list-of-scope-tokens). There are 2 methods that help us manage scopes throughout development process.
+When searching for scopes we look for **"scope tokens"**. There are 2 methods that help us manage scopes throughout development process.
 
-#### 1.5.1. `Var.nearest_scope()` method
+#### 3.6.1. `VarMapObject.nearest_scope()` method
 
 Function that returns a context of nearest **"scope token"**.
 
@@ -204,7 +294,7 @@ def nearest_scope(ctx):
   """
 ```
 
-#### 1.5.2. `Var.nth_nearest_scope()` method
+#### 3.6.2. `VarMapObject.nth_nearest_scope()` method
 
 Function used with `parentes` keyword. It helps wind variables above certain number of scopes.
 
@@ -230,13 +320,11 @@ def nth_nearest_scope(ctx, n):
   """
 ```
 
-### 1.6. Calculating current `recursion_level`
+### 3.7. Calculating current `recursion_level`
 
-When function is invoked, then a `recursion_level` attribute on `FuncVar` object that holds function context is incremented. When function returns - attribute is decremented. While trying to access any variable we use `Var.nearest_recursion_level()` static method to search for closest function scope (or start scope for global variables) and get it's `recursion_level` value.
+When function is invoked, then a `recursion_level` attribute on `Func` object that holds function context is incremented. When function returns - attribute is decremented. While trying to access any variable we use `VarMapObject.nearest_recursion_level()` static method to search for closest function scope (or start scope for global variables) and get it's `recursion_level` value.
 
-\* `recursion_level` is calculated from node which is a context parent for specified variable inside `var_map` (or from the closest parent with a function or start context)
-
-#### 1.6.1. `Var.nearest_recursion_level()` method
+#### 3.7.1. `VarMapObject.nearest_recursion_level()` method
 
 ```py
 def nearest_recursion_level(ctx, var_map):
@@ -259,18 +347,19 @@ def nearest_recursion_level(ctx, var_map):
   """
 ```
 
-## 2. ANTLR Grammar
+## 4. ANTLR Grammar
 
-### 2.1. Indents
+### 4.1. Indents
 
 For indentation mechanic we used a Antlr **addon**: `antlr-denter` [[LINK]](https://github.com/yshavit/antlr-denter).  
+
 We followed instructions and implemented it in our language. It helps us keep track of indentation level and check if it is correct. Antlr rules that use indentation looks like this:
 
 ```antlr
 block: INDENT statement+ DEDENT
 ```
 
-### 2.2. String templating
+### 4.2. String templating
 
 For string templating we used Antler lexer **modes**. There are 3 modes:
 
@@ -280,7 +369,7 @@ For string templating we used Antler lexer **modes**. There are 3 modes:
 
 **Modes** are only used for string templating because we decided to use them at the and of the project when all the rest was done. Using modes earlier would probably be a good idea.
 
-### 2.3. Possible value types
+### 4.3. Possible value types
 
 Every value that exists in Scriptorium is a **expr**. There are many possible operations depending on type of variables and/or constants. 
 
@@ -300,13 +389,15 @@ Expr can be one of:
    * Function invocation result
    * Other variable assignment
 
-#### 2.3.1. Diagram of `expr` possible paths
+#### 4.3.1. Diagram of `expr` possible paths
+
+This diagram show possible children of **"expr"** node.
 
 ![Expr states](./expr.png)
 
-#### 2.3.2. Type casting
+#### 4.3.2. Type casting
 
-##### 2.3.2.1. Automatic type casting
+##### 4.3.2.1. Automatic type casting
 
 There are few moments when `expr` value is automatically casted to the right type. Those scenarios are:
 
@@ -320,15 +411,16 @@ There are few moments when `expr` value is automatically casted to the right typ
 
 3. **Returning from function**
 
-    Based on metadata stored in `FuncVar.return_type`
+    Based on metadata stored in `Func.return_type`
 
 *\* There is also a **numericExpr** - merge of floatExpr and intExpr, that allows user to make operations on both integers and float numbers without casting.*
 
-##### 2.3.2.2. Manual type casting
+##### 4.3.2.2. Manual type casting
 
 In other scenarios where there is no metadata found on what is the target type of value. For manual casting there is a `ut` keyword.
 
 ```scriptorium
 scribere 2 adde "2" ut numerus. // Result: "4.0"
+scribere 2 ut sententia adde "2". // Result: "22"
 scribere 2 adde "2". // CULPA: linea 2:19 - syntax error at "2".
 ```

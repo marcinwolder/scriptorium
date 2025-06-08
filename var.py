@@ -27,7 +27,7 @@ class Var:
         while parent_ctx is not None:
             if type(parent_ctx) == ScriptoriumParser.FunctionDeclarationContext:
                 outer_ctx = Var.nearest_scope(parent_ctx.parentCtx)
-                func_var: FuncVar = var_map[outer_ctx][parent_ctx.NAME().getText()]
+                func_var: Func = var_map[outer_ctx][parent_ctx.NAME().getText()]
                 recursion_level = func_var.recursion_level
                 break
             parent_ctx = parent_ctx.parentCtx
@@ -147,7 +147,7 @@ class Var:
     def __repr__(self):
         return self.__str__()
     
-class FuncVar(Var):
+class Func(Var):
     def __init__(self, type_id: int, return_type: int, function_ctx, declaration_position: Tuple[int, int]):
         super().__init__(type_id, declaration_position)
         self.return_type = return_type
@@ -155,7 +155,7 @@ class FuncVar(Var):
         self.recursion_level = -1
     
     def __str__(self):
-        return f"<FuncVar: typeId={self.type_id}, value={self.value}, returnType={self.return_type}>"
+        return f"<Func: typeId={self.type_id}, functionCtx={self.function_ctx.__repr__()}, returnType={self.return_type}>"
     
 class ParamVar(Var):
     def __str__(self):

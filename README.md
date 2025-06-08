@@ -1,4 +1,4 @@
-# 🪶 Scriptorium
+# 🖋 Scriptorium
 
 Scriptorium is an original, experimental programming language inspired by the syntax of imperative languages (such as Python or C), equipped with its own parser, lexer, and interpreter based on ANTLR4. It supports variables, functions (with recursion), loops, and flow control. The project serves as a foundation for learning about programming language construction, syntactic and semantic analysis, and as an educational tool.
 
@@ -8,52 +8,52 @@ Scriptorium is an original, experimental programming language inspired by the sy
 
 ### ⚙ System Requirements
 
-- Python **3.8+**
-- System: Windows, Linux, or macOS
-- Java (required by ANTLR): minimum Java 8
+- Windows/Linux
+- Python 3.8+
 
----
+### 📚 Installing
 
-### 📚 Installing Dependencies
+- Copy **Scriptorium** repository into a folder on your machine
+- In main repository directory, create `./venv` folder for virtual environment and install requirements
 
-1. **Create a virtual environment** (recommended):
+    ```bash
+    # Create `venv` folder with virtual environment
+    $ python -m venv venv
 
-```bash
-py -m venv venv
-source venv/Scripts/activate       # Windows
-# or
-source venv/bin/activate           # Linux/macOS
-```
+    # Activate virtual environment
+    $ source venv/Scripts/activate # For Windows
+    $ source venv/bin/activate # For Linux
+    
+    # Install all dependencies in virtual environment
+    $ pip install -r requirements.txt
+    ```
 
-2. **Install required modules**:
+- Add main repository folder path to `SCRIPTORIUM_HOME` environmental variable
 
-```bash
-pip install -r requirements.txt
-```
+    - For Windows:
 
-> 📄 Ensure that the `requirements.txt` file contains:
->
-> * `antlr4-tools`
-> * `antlr4-python3-runtime`
-> * `antlr-denter`
+        ```batch
+        set SCRIPTORIUM_HOME="%cd%"
+        ```
 
----
+    - For Linux:
 
-### 🛠️ Compiling the ANTLR Grammar
+        ```bash
+        export SCRIPTORIUM_HOME="$(pwd)"
+        ```
 
-The parser and visitor are generated from the `Scriptorium.g4` grammar file. To build the project:
+- Add scriptorium path to `PATH`
+    - For Windows: Add `%SCRIPTORIUM_HOME%\windows`
 
-```bash
-cd ./Scriptorium
-antlr4 ./Scriptorium.g4 -visitor -Dlanguage=Python3
-```
+        ```batch
+        set PATH="%PATH%;%SCRIPTORIUM_HOME%\windows"
+        ```
 
-After this operation, the following files should appear in the directory:
+    - For Linux: Add `$SCRIPTORIUM_HOME/linux`
 
-* `ScriptoriumParser.py`
-* `ScriptoriumLexer.py`
-* `ScriptoriumVisitor.py`
-* `ScriptoriumListener.py`
+        ```bash
+        export PATH="$PATH:$SCRIPTORIUM_HOME/linux"
+        ```
 
 ---
 
@@ -62,49 +62,22 @@ After this operation, the following files should appear in the directory:
 1. Create a source file in the Scriptorium language with the `.cr7` extension:
 
 ```bash
-touch hello.cr7
+echo "scribere \"Hello world!\"." > hello.cr7
 ```
 
-2. In the root directory, run the interpreter:
+2. Run the interpreter:
 
 ```bash
-python main.py hello.cr7
+scriptorium hello.cr7
 ```
 
----
-
-### 🧪 Example Session
+3. Result should look like:
 
 ```bash
-$ python main.py hello.cr7
-CULPA: linea 1:18 - missing NL at 'numerus'
+Hello world!
 ```
 
----
-
-### 🧰 Developer Tools
-
-If you use a code editor like VSCode, you can take advantage of extensions for:
-
-* Support for `.g4` syntax (ANTLR)
-* Support for `venv` environments
-* Python debugger
-
----
-
-### 🔧 Troubleshooting and Debugging
-
-* If the `antlr4` command is not available in the terminal, add ANTLR to the environment variables.
-* Ensure your Java version is up to date (`java -version`).
-* If ANTLR generates files to a different directory, use the `-o .` flag in the command:
-
-```bash
-antlr4 -Dlanguage=Python3 -visitor -o . Scriptorium.g4
-```
-
----
-
-Ready! Now you can write programs in `.cr7` and run them using your own interpreter 🎉
+You're ready! Now you can write programs in `.cr7` and run them using **Scriptorium** interpreter 🎉
 
 ## 🧾 Syntax and Basics
 
@@ -118,13 +91,13 @@ Variables are declared using a type (`numerus`, `fractio`, `veritas`, `sententia
 
 ```cr7
 numerus a esto 10.
-sententia powitanie esto "salve".
+sententia x esto "salve".
 ```
 
 Declaration without assignment:
 
 ```cr7
-fractio zmienna.
+fractio var.
 ```
 
 ---
@@ -150,14 +123,14 @@ scribere "x = ${x}.". // Output: "x = 2."
 Functions are defined using `munus`, specifying the return type, name, parameters, and action block:
 
 ```cr7
-numerus munus suma(numerus a et numerus b):
+numerus munus sum(numerus a et numerus b):
     reddere a adde b.
 ```
 
 Function call:
 
 ```cr7
-numerus wynik esto suma(5 et 10).
+numerus wynik esto sum(5 et 10).
 ```
 
 ---
@@ -273,10 +246,10 @@ Scriptorium supports **statically typed** variables of four main data types and 
 Variables are assigned using `esto`:
 
 ```cr7
-numerus wiek esto 25.
+numerus age esto 25.
 fractio pi esto 3,14.
-sententia powitanie esto "salve!".
-veritas aktywne esto verum.
+sententia message esto "salve!".
+veritas active esto verum.
 ```
 
 ---
@@ -297,7 +270,7 @@ x esto "five".  // ❌ Error – type `sententia` incompatible with `numerus`
 The `rogare` keyword can be used to read user input. The result is always a `sententia`.
 
 ```cr7
-sententia imie esto rogare "Enter name: ".
+sententia name esto rogare "Enter name: ".
 ```
 
 ---
@@ -340,7 +313,7 @@ func().
 
 ### 🧠 Function Variable (`munus` as an object)
 
-Functions	In	Scriptorium	are	represented as variables of type `FuncVar` (internally). They can be called the same way as variables:
+Functions	In	Scriptorium	are	represented as variables of type `Func` (internally). They can be called the same way as variables:
 
 ```cr7
 numerus munus sum(numerus a et numerus b):
@@ -441,7 +414,7 @@ The Scriptorium language interpreter project is divided into several key compone
 | **`Scriptorium.g4`**   | Grammar file — contains parser and lexer rules, defines syntax and tokens.                     |
 | **`main.py`**          | Entry point of the interpreter. Loads the `.cr7` file, initializes the parser and visitor.     |
 | **`visitor.py`**       | Implementation of the visitor, which traverses the syntax tree and interprets the code.         |
-| **`var.py`**           | Definitions of variable classes (`Var`, `FuncVar`, `ParamVar`) and mechanisms for scope and value management. |
+| **`var.py`**           | Definitions of variable classes (`Var`, `Func`, `ParamVar`) and mechanisms for scope and value management. |
 | **`VariableListener.py`** | Listener that builds a map of variables and functions and detects declaration errors.           |
 | **`requirements.txt`** | List of required libraries and tools (e.g., `antlr4-python3-runtime`, `antlr4-tools`, `antlr-denter`). |
 
@@ -491,7 +464,7 @@ The Scriptorium language interpreter project is divided into several key compone
 - **ANTLR4** — generates lexers and parsers from the `.g4` file.
 - **antlr4-python3-runtime** — runtime for parser support in Python.
 - **antlr-denter** — lexer extension for handling indentation (indent/dedent) in the style of Python.
-- **Python 3.13** — runtime environment.
+- **Python 3.8** — runtime environment.
 
 ---
 
@@ -503,7 +476,7 @@ Source files for the Scriptorium language have the `.cr7` extension.
 ### 2. How do I run a program written in Scriptorium?  
 After creating a `.cr7` file, run the interpreter with the command:  
 ```bash
-py main.py program.cr7
+scriptorium program.cr7
 ```
 
 ### 3. What should I do if I encounter a syntax error starting with "CULPA"?

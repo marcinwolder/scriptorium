@@ -1,11 +1,17 @@
+import inspect
 import math
 import re
+import sys
 from typing import List
 import difflib
 
+from antlr4 import TerminalNode
+
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
-from var import FuncVar, ParamVar, Var
+from var import Func, ParamVar, Var
+
+RECURRENCE_LIMIT = 1000
 
 def cast_to_type(value, type_id):
     if type_id == ScriptoriumParser.INT_TYPE:
@@ -227,7 +233,10 @@ class Visitor(ScriptoriumVisitor):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
 
     def visitVarExpr(self, ctx):
-        parent_level_ctx = Var.nth_nearest_scope(ctx, len(ctx.PARENT()))
+        recursion_level = 0
+        if ctx.PARENT():
+            recursion_level = len(ctx.PARENT())
+        parent_level_ctx = Var.nth_nearest_scope(ctx, recursion_level)
 
         try:
             (var, parent_ctx) = Var.nearest_scope_variable(parent_level_ctx, self.var_map, return_parent_ctx=True, name=ctx.NAME().getText(), scope=len(ctx.PARENT()))
@@ -252,7 +261,7 @@ class Visitor(ScriptoriumVisitor):
     # FUNCTIONS
 
     def visitFunctionInvocation(self, ctx):
-        function_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map)
+        function_var: Func = Var.nearest_scope_variable(ctx, self.var_map)
         if not function_var.declaration_position[0] < ctx.start.line:
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - function named \"{ctx.NAME().getText()}\" is not yet defined")
         parameters = self.var_map[function_var.function_ctx].values() if function_var.function_ctx in self.var_map.keys() else []
@@ -260,15 +269,17 @@ class Visitor(ScriptoriumVisitor):
         arguments = ctx.expr()
         if len(parameters) != len(arguments):
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - wrong number of arguments - got: {len(arguments)}, expected: {len(parameters)}")
+        recursion_level = Var.nearest_recursion_level(function_var.function_ctx, self.var_map)
         for param, expr in zip(parameters, ctx.expr()):
             try:
                 casted_value = cast_to_type(self.visit(expr), param.type_id)
-                recursion_level = Var.nearest_recursion_level(function_var.function_ctx, self.var_map)
                 param.change_or_append_value(recursion_level+1, casted_value)
             except Exception as e:
                 raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - type transformation error, {e}")
         try:
             function_var.recursion_level += 1
+            if function_var.recursion_level >= RECURRENCE_LIMIT:
+                raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - function named \"{ctx.NAME().getText()}\" is recursive, but recurrence limit is set to {RECURRENCE_LIMIT}")
             self.visit(function_var.function_ctx.actionBlock())
             function_var.recursion_level -= 1
         except Exception as e:
