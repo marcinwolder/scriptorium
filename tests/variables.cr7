@@ -1,0 +1,57 @@
+// Test 1: Simple declaration and assignment
+scribere "TEST 1".
+numerus a esto 5.
+scribere a.
+
+// Test 2: Reassignment
+scribere "TEST 2".
+a esto 20.
+scribere a.
+
+// Test 3: Redeclaration (should be error)
+scribere "TEST 3".
+//numerus a esto 30.
+scribere a.
+
+// Test 4: Using variable before declaration (should be error)
+scribere "TEST 4".
+//scribere b.
+numerus b esto 10.
+
+// Test 5: Variable scope - local should shadow global
+scribere "TEST 5".
+numerus x esto 200.
+nihil munus test_scope():
+	numerus x esto 100.
+	scribere x.
+test_scope().
+scribere x.
+
+// Test 6: Assignemt without declaration inside function (function modifies global variable)
+scribere "TEST 6".
+nihil munus test_assign():
+	x esto 150.
+test_assign().
+scribere x.
+
+// Test 7: Concatenating string variables
+scribere "TEST 7".
+sententia s esto "Best" adde " Language" adde " 100%".
+scribere s.
+
+// Test 8: Casting boolean into floating point number
+scribere "TEST 8".
+fractio zzz esto "a" aequalis "a".
+scribere zzz.
+
+// Test 9: Assignemt string into numeric varaible (should be error)
+scribere "TEST 9".
+numerus str esto 5.
+scribere str.
+// str esto "string".
+
+// Test 10: Adding string to number
+scribere "TEST 10".
+numerus num esto 2.
+sententia sen esto "Hi!".
+scribere num adde sen.

@@ -1,0 +1,11 @@
+numerus x esto -6.
+numerus y esto -6.
+
+si x aequalis y:
+    scribere "x == y".
+    si x maior quam 0:
+        scribere "x jest dodatnie".
+    aliter:
+        scribere "x jest ujemne".
+aliter:
+    scribere "x != y".

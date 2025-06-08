@@ -1,0 +1,18 @@
+// TEST 1: Simple logic operation
+scribere "TEST 1".
+scribere verum etiam verum.
+
+//TEST 2: Priority of operations
+scribere "TEST 2".
+numerus res esto 2 adde 2 multiplica 2.
+scribere res.
+
+//TEST 3: Logic operation priority (AND higher priority result should be TRUE)
+scribere "TEST 3".
+veritas a esto verum aut falsum etiam falsum.
+scribere a.
+
+// TEST 4: Comparing numbers to sting (should be error)
+scribere "TEST 4".
+//veritas aa esto "2" maior quam 2.
+scribere aa.

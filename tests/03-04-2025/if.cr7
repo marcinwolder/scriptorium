@@ -1,0 +1,7 @@
+si verum: 
+	scribere "if block".
+aliter si falsum: 
+	scribere "if else block".
+aliter: 
+	scribere "else block".
+scribere "Hej".

@@ -1,0 +1,10 @@
+numerus year esto 2025.
+
+nihil munus hello(sententia name et numerus age):
+	//numerus name esto 22.
+	repetere i ex 1 ad 10:
+		scribere i.
+	scribere "Hello " adde name adde "!" et "Age" et age et "Year" et year.
+
+hello("Marcin" et 22).
+hello("Staszek" et 20).

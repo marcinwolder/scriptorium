@@ -1,0 +1,7 @@
+numerus munus summare(numerus primum, numerus secundum):
+	reddere primum adde secundum.
+	numerus munus summare2(numerus primum, numerus secundum):
+		reddere primum adde secundum.
+		scribere "test2".
+	scribere "test".
+scribere "test3".
