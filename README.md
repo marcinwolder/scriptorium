@@ -9,10 +9,22 @@ Scriptorium is an original, experimental programming language inspired by the sy
 ### ⚙ System Requirements
 
 - Windows
+- Python 3.8+
 
 ### 📚 Installing
 
 - Copy **Scriptorium** repository into a folder on your machine
+- Create venv and install requirements
+
+    ```bash
+    # Create `venv` folder with virtual environment
+    $ py -3.8 -m venv venv
+    # Activate virtual environment
+    $ source venv/Scripts/activate
+    # Install all dependencies in virtual environment
+    $ pip install -r requirements.txt
+    ```
+
 - Add main repository folder path to `SCRIPTORIUM_HOME` environmental variable
 - Add `%SCRIPTORIUM_HOME%` into `PATH` environmental variable
 
