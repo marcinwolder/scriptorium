@@ -29,9 +29,31 @@ Scriptorium is an original, experimental programming language inspired by the sy
     ```
 
 - Add main repository folder path to `SCRIPTORIUM_HOME` environmental variable
+
+    - For Windows:
+
+        ```batch
+        set SCRIPTORIUM_HOME="%cd%"
+        ```
+
+    - For Linux:
+
+        ```bash
+        export SCRIPTORIUM_HOME="$(pwd)"
+        ```
+
 - Add scriptorium path to `PATH`
     - For Windows: Add `%SCRIPTORIUM_HOME%\Windows`
-    - For Linux: Add `%SCRIPTORIUM_HOME%\Linux`
+
+        ```batch
+        set PATH="%PATH%;%SCRIPTORIUM_HOME%\Windows"
+        ```
+
+    - For Linux: Add `$SCRIPTORIUM_HOME/Linux`
+
+        ```bash
+        export PATH="$PATH:$SCRIPTORIUM_HOME/Linux"
+        ```
 
 ---
 
