@@ -1,9 +1,0 @@
-numerus x esto -12.
-numerus y esto 10.
-
-si x minor quam y:
-	scribere "x jest mniejsze niż y".
-aliter si x aequalis y:
-	scribere "x równa się y".
-aliter:
-	scribere "x jest większe niż y".

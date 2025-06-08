@@ -1,9 +1,0 @@
-// TEST 1: Simple recursion function
-numerus munus fib(numerus n):
-	si n minor aequalis 1:
-		reddere n.
-	aliter:
-		reddere fib(n minue 1) adde fib(n minue 2).
-
-// should be 2584
-scribere fib(18).

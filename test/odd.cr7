@@ -1,8 +1,0 @@
-nihil munus printOdd(numerus n):
-	repetere i ex 0 ad n:
-		si i residuum 2 aequalis 0:
-			perge.
-		scribere i.
-
-numerus m esto 100.
-printOdd(m).
