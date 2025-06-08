@@ -9,7 +9,7 @@ from antlr4 import TerminalNode
 
 from Scriptorium.ScriptoriumParser import ScriptoriumParser
 from Scriptorium.ScriptoriumVisitor import ScriptoriumVisitor
-from var import FuncVar, ParamVar, Var
+from var import Func, ParamVar, Var
 
 RECURRENCE_LIMIT = 1000
 
@@ -261,7 +261,7 @@ class Visitor(ScriptoriumVisitor):
     # FUNCTIONS
 
     def visitFunctionInvocation(self, ctx):
-        function_var: FuncVar = Var.nearest_scope_variable(ctx, self.var_map)
+        function_var: Func = Var.nearest_scope_variable(ctx, self.var_map)
         if not function_var.declaration_position[0] < ctx.start.line:
             raise Exception(f"CULPA: linea {ctx.start.line}:{ctx.start.column} - function named \"{ctx.NAME().getText()}\" is not yet defined")
         parameters = self.var_map[function_var.function_ctx].values() if function_var.function_ctx in self.var_map.keys() else []
